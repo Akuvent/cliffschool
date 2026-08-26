@@ -1,8 +1,8 @@
 # Fix: Permission 'iam.serviceAccounts.getAccessToken' denied
 # Run in Cloud Shell: https://shell.cloud.google.com/
 
-PROJECT_ID="project-c65cfe46-12a8-493f-b49"
-PROJECT_NUMBER="639187831047"
+PROJECT_ID="cliffschool"
+PROJECT_NUMBER="725275517762"
 REPO="Akuvent/cliffschool"
 SA="github-deployer"
 SA_EMAIL="${SA}@${PROJECT_ID}.iam.gserviceaccount.com"

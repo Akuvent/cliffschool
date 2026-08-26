@@ -1,7 +1,7 @@
 # Run once in Google Cloud Shell: https://shell.cloud.google.com/
-# Project: project-c65cfe46-12a8-493f-b49 | Repo: Akuvent/cliffschool
+# Project: cliffschool | Repo: Akuvent/cliffschool
 
-PROJECT_ID="project-c65cfe46-12a8-493f-b49"
+PROJECT_ID="cliffschool"
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
 REPO="Akuvent/cliffschool"
 SA="github-deployer"

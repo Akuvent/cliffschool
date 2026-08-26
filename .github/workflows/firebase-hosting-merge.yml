@@ -10,9 +10,9 @@ permissions:
   id-token: write
 
 env:
-  PROJECT_ID: project-c65cfe46-12a8-493f-b49
+  PROJECT_ID: cliffschool
   # Replace after running scripts/setup-github-deploy.sh in Cloud Shell
-  PROJECT_NUMBER: "639187831047"
+  PROJECT_NUMBER: "725275517762"
 
 jobs:
   deploy_live:
