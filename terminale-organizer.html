@@ -43,7 +43,9 @@
   body.dark .res-card,
   body.dark .today-input input[type=text],
   body.dark .today-input select,
-  body.dark .chapter summary{
+  body.dark .chapter summary,
+  body.dark .auth-bar,
+  body.dark .auth-bar input{
     background:var(--paper);
   }
 
@@ -64,16 +66,26 @@
     transition:background-color .2s ease, border-color .2s ease, color .2s ease;
   }
 
-  .mode-toggle{
+  .header-actions{
     position:absolute;
     top:52px; right:40px;
     z-index:3;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    max-width:min(100%, 420px);
+  }
+  .mode-toggle,
+  .auth-signout{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
     font-weight:600;
     letter-spacing:0.04em;
     display:flex;
     align-items:center;
+    justify-content:center;
     gap:8px;
     background:var(--paper);
     border:1.5px solid var(--line);
@@ -81,11 +93,21 @@
     padding:8px 14px;
     border-radius:20px;
     cursor:pointer;
+    min-height:44px;
   }
-  .mode-toggle:hover{ border-color:var(--ink-soft); }
-  @media (max-width:640px){
-    .mode-toggle{ position:static; margin:16px 18px 0 54px; display:inline-flex; }
+  .mode-toggle:hover,
+  .auth-signout:hover{ border-color:var(--ink-soft); }
+  .sync-status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    padding:0 4px;
   }
+  .sync-status.saving{ color:var(--red); }
+  .sync-status.synced{ color:var(--c-nsi); }
 
   /* punch holes along the left edge, like a real binder page */
   body::before{
@@ -144,6 +166,103 @@
     font-size:15.5px;
     line-height:1.5;
   }
+
+  .auth-bar{
+    margin-top:22px;
+    max-width:560px;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+  }
+  .auth-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:14px;
+  }
+  .auth-tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:10px 14px;
+    min-height:44px;
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .auth-tab.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .auth-form{
+    display:grid;
+    gap:10px;
+  }
+  .auth-form label{
+    display:grid;
+    gap:6px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink-soft);
+  }
+  .auth-form input{
+    font-family:'Work Sans', sans-serif;
+    font-size:14.5px;
+    padding:11px 14px;
+    min-height:44px;
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    background:#fffdf8;
+    color:var(--ink);
+  }
+  body.dark .auth-form input{ background:var(--paper-dark); }
+  .auth-form input:focus{
+    outline:2px solid var(--c-math);
+    outline-offset:1px;
+  }
+  .auth-form button[type=submit]{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:12px 20px;
+    min-height:44px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .auth-form button[type=submit]:hover{ opacity:0.92; }
+  .auth-error{
+    font-size:13px;
+    color:var(--red);
+    line-height:1.4;
+  }
+  .auth-user{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .auth-user strong{ color:var(--ink); }
+
+  .sync-login-msg{
+    margin:16px 0;
+    padding:16px 18px;
+    background:var(--paper);
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+    font-size:14px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+  body.authed .sync-login-msg{ display:none; }
+  body:not(.authed) .sync-data{ display:none; }
 
   nav.tabs{
     position:relative;
@@ -278,14 +397,16 @@
   /* Today panel */
   .today-input{
     display:flex;
+    flex-wrap:wrap;
     gap:8px;
     margin-bottom:20px;
   }
   .today-input input[type=text]{
-    flex:1;
+    flex:1 1 180px;
     font-family:'Work Sans', sans-serif;
     font-size:14.5px;
     padding:11px 14px;
+    min-height:44px;
     border:1.5px solid var(--paper-dark);
     border-radius:8px;
     background:var(--paper);
@@ -294,6 +415,7 @@
     font-family:'IBM Plex Mono', monospace;
     font-size:12.5px;
     padding:0 10px;
+    min-height:44px;
     border:1.5px solid var(--paper-dark);
     border-radius:8px;
     background:var(--paper);
@@ -306,6 +428,7 @@
     color:#fff;
     border:none;
     padding:0 20px;
+    min-height:44px;
     border-radius:8px;
     cursor:pointer;
   }
@@ -317,6 +440,7 @@
     margin-left:auto;
     background:none; border:none; color:var(--ink-soft);
     cursor:pointer; font-size:16px; opacity:0.5;
+    min-width:44px; min-height:44px;
   }
   #todo-list .del:hover{ opacity:1; color:var(--red); }
   .empty{ color:var(--ink-soft); font-size:14px; font-style:italic; padding:14px 0; }
@@ -342,7 +466,6 @@
   .res-group.math h3::before{ background:var(--c-math); }
   .res-group.nsi h3::before{ background:var(--c-nsi); }
   .res-group.other h3::before{ background:var(--ink-soft); }
-  .res-group.tools h3::before{ background:var(--yellow); }
 
   .res-grid{
     display:grid;
@@ -394,20 +517,69 @@
 
   @media (max-width:640px){
     header{ padding:40px 18px 24px 54px; }
+    .header-actions{
+      position:static;
+      margin:0 0 16px 0;
+      max-width:none;
+      justify-content:flex-start;
+    }
     nav.tabs{ padding:0 18px 0 54px; }
     main{ margin:0 18px 0 54px; padding:24px 18px 30px; }
     footer{ padding-left:54px; }
     body::before{ left:10px; width:10px; background-size:10px 60px;}
+    .auth-bar{ max-width:none; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <button class="mode-toggle" id="mode-toggle">☾ &nbsp;Mode sombre</button>
+  <div class="header-actions">
+    <span class="sync-status" id="sync-status" aria-live="polite"></span>
+    <button class="mode-toggle" id="mode-toggle" type="button">☾ &nbsp;Mode sombre</button>
+    <button class="auth-signout" id="auth-signout" type="button" hidden>Déconnexion</button>
+  </div>
   <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
   <h1>Carnet de <em>Terminale</em></h1>
   <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
+
+  <div class="auth-bar" id="auth-bar">
+    <div class="auth-forms" id="auth-forms">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-auth-tab="login">Connexion</button>
+        <button type="button" class="auth-tab" data-auth-tab="signup">Créer un compte</button>
+      </div>
+      <form id="auth-login" class="auth-form">
+        <label for="login-username">Identifiant
+          <input type="text" id="login-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
+        </label>
+        <label for="login-password">Mot de passe
+          <input type="password" id="login-password" autocomplete="current-password" required minlength="6">
+        </label>
+        <button type="submit">Se connecter</button>
+        <p class="auth-error" id="login-error" hidden></p>
+      </form>
+      <form id="auth-signup" class="auth-form" hidden>
+        <label for="signup-username">Identifiant
+          <input type="text" id="signup-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
+        </label>
+        <label for="signup-password">Mot de passe
+          <input type="password" id="signup-password" autocomplete="new-password" required minlength="6">
+        </label>
+        <label for="signup-password2">Confirmer le mot de passe
+          <input type="password" id="signup-password2" autocomplete="new-password" required minlength="6">
+        </label>
+        <label for="signup-school">Code école
+          <input type="text" id="signup-school" autocomplete="off" required>
+        </label>
+        <button type="submit">Créer un compte</button>
+        <p class="auth-error" id="signup-error" hidden></p>
+      </form>
+    </div>
+    <div class="auth-user" id="auth-user" hidden>
+      Connecté en tant que <strong id="auth-username-display"></strong>
+    </div>
+  </div>
 </header>
 
 <nav class="tabs">
@@ -429,27 +601,32 @@
   <section class="panel active" id="panel-today">
     <h2>Aujourd'hui</h2>
     <span class="tag" style="background:var(--ink)">Liste du jour</span>
-    <div class="today-input">
-      <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
-      <select id="todo-subject">
-        <option value="math">Maths</option>
-        <option value="nsi">NSI</option>
-        <option value="philo">Philo</option>
-        <option value="phys">Physique-Chimie</option>
-        <option value="eng">Anglais</option>
-        <option value="ger">Allemand</option>
-        <option value="sport">Sport</option>
-      </select>
-      <button id="todo-add">Ajouter</button>
+    <div class="sync-login-msg">Connecte-toi avec ton identifiant pour voir et modifier ta liste du jour — elle se synchronise entre tes appareils.</div>
+    <div class="sync-data">
+      <div class="today-input">
+        <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
+        <select id="todo-subject">
+          <option value="math">Maths</option>
+          <option value="nsi">NSI</option>
+          <option value="philo">Philo</option>
+          <option value="phys">Physique-Chimie</option>
+          <option value="eng">Anglais</option>
+          <option value="ger">Allemand</option>
+          <option value="sport">Sport</option>
+        </select>
+        <button type="button" id="todo-add">Ajouter</button>
+      </div>
+      <div id="todo-list"></div>
+      <div class="note">Ta liste est enregistrée sur ton compte et synchronisée entre PC et téléphone.</div>
     </div>
-    <div id="todo-list"></div>
-    <div class="note">Cette liste est sauvegardée directement sur cet appareil (localStorage). Pour une vraie synchro PC ↔ téléphone, utilise ton espace Notion — cette page est un tableau de bord d'appoint.</div>
   </section>
 
   <!-- MATH -->
   <section class="panel" id="panel-math">
     <h2>Maths — avance de rentrée</h2>
     <span class="tag" style="background:var(--c-math)">Spécialité</span>
+    <div class="sync-login-msg">Connecte-toi pour cocher les chapitres — ta progression est synchronisée avec ton compte.</div>
+    <div class="sync-data">
 
     <details class="chapter" open>
       <summary>Suites numériques</summary>
@@ -484,13 +661,16 @@
         <div class="todo-line"><input type="checkbox" id="m10"><label for="m10">Variations, limites, composition</label></div>
       </div>
     </details>
-    <div class="note">Coche au fur et à mesure — l'état est sauvegardé automatiquement sur cet appareil.</div>
+    <div class="note">Coche au fur et à mesure — l'état est synchronisé avec ton compte sur tous tes appareils.</div>
+    </div>
   </section>
 
   <!-- NSI -->
   <section class="panel" id="panel-nsi">
     <h2>NSI — avance de rentrée</h2>
     <span class="tag" style="background:var(--c-nsi)">Spécialité</span>
+    <div class="sync-login-msg">Connecte-toi pour cocher les chapitres — ta progression est synchronisée avec ton compte.</div>
+    <div class="sync-data">
 
     <details class="chapter" open>
       <summary>Récursivité</summary>
@@ -510,6 +690,7 @@
       </div>
     </details>
     <div class="note">Ces deux thèmes reviennent tout au long de l'année en NSI — les voir en avance rend tout le reste plus facile.</div>
+    </div>
   </section>
 
   <!-- PHILO -->
@@ -551,16 +732,19 @@
   <section class="panel" id="panel-edt">
     <h2>Emploi du temps</h2>
     <span class="tag" style="background:#5C5F66">À compléter à la rentrée</span>
-    <div class="note" style="margin-bottom:20px;">Emplacement réservé — tu n'as pas encore ton emploi du temps définitif. Clique dans une case pour noter un cours une fois qu'il te sera donné (ex. "Maths — salle 12"). Tout se sauvegarde automatiquement.</div>
-    <div style="overflow-x:auto;">
-      <table id="schedule-table" style="border-collapse:collapse; width:100%; min-width:680px; font-size:13px;">
-        <thead>
-          <tr>
-            <th style="text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;">Créneau</th>
-          </tr>
-        </thead>
-        <tbody id="schedule-body"></tbody>
-      </table>
+    <div class="sync-login-msg">Connecte-toi pour remplir ton emploi du temps — il sera synchronisé avec ton compte.</div>
+    <div class="sync-data">
+      <div class="note" style="margin-bottom:20px;">Emplacement réservé — tu n'as pas encore ton emploi du temps définitif. Clique dans une case pour noter un cours une fois qu'il te sera donné (ex. « Maths — salle 12 »). Tout est synchronisé avec ton compte.</div>
+      <div style="overflow-x:auto;">
+        <table id="schedule-table" style="border-collapse:collapse; width:100%; min-width:680px; font-size:13px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;">Créneau</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-body"></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -606,27 +790,6 @@
       </div>
     </div>
 
-    <div class="res-group tools">
-      <h3>Organisation</h3>
-      <div class="res-grid">
-        <a class="res-card" href="https://calendar.google.com/" target="_blank" rel="noopener">
-          <div class="name">Google Calendar</div>
-          <div class="desc">Pour ton emploi du temps fixe, synchronisé entre PC et téléphone.</div>
-          <span class="url">calendar.google.com</span>
-        </a>
-        <a class="res-card" href="https://todoist.com/" target="_blank" rel="noopener">
-          <div class="name">Todoist</div>
-          <div class="desc">Listes de tâches quotidiennes avec rappels et tâches récurrentes, gratuit.</div>
-          <span class="url">todoist.com</span>
-        </a>
-        <a class="res-card" href="https://www.notion.com/" target="_blank" rel="noopener">
-          <div class="name">Notion</div>
-          <div class="desc">Ton espace déjà configuré pour les matières, tâches et calendrier.</div>
-          <span class="url">notion.com</span>
-        </a>
-      </div>
-    </div>
-
     <div class="note">Tous ces liens ouvrent un nouvel onglet. Si un site te semble payant ou peu fiable, ferme-le et reviens ici — ces sélections sont toutes gratuites et largement utilisées par des lycéens français.</div>
   </section>
 
@@ -647,17 +810,6 @@
     });
   });
 
-  // Persist chapter checkboxes
-  document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
-    const key = 'chk-' + cb.id;
-    const saved = localStorage.getItem(key);
-    if (saved === '1') cb.checked = true;
-    cb.addEventListener('change', () => {
-      localStorage.setItem(key, cb.checked ? '1' : '0');
-    });
-  });
-
-  // Today to-do list
   const subjColors = {
     math:'var(--c-math)', nsi:'var(--c-nsi)', philo:'var(--c-philo)',
     phys:'var(--c-phys)', eng:'var(--c-eng)', ger:'var(--c-ger)', sport:'var(--c-sport)'
@@ -671,64 +823,141 @@
   const input = document.getElementById('todo-text');
   const subjSelect = document.getElementById('todo-subject');
   const addBtn = document.getElementById('todo-add');
+  const syncStatusEl = document.getElementById('sync-status');
+  const authForms = document.getElementById('auth-forms');
+  const authUser = document.getElementById('auth-user');
+  const authUsernameDisplay = document.getElementById('auth-username-display');
+  const authSignoutBtn = document.getElementById('auth-signout');
 
-  function loadTodos(){
-    try { return JSON.parse(localStorage.getItem('todos') || '[]'); }
-    catch(e){ return []; }
+  let appData = { todos: [], checkboxes: {}, schedule: {} };
+  let isAuthed = false;
+  let applyingRemote = false;
+
+  function whenSyncReady(fn){
+    if (window.CarnetSync) fn();
+    else window.addEventListener('carnet-sync-ready', fn, { once: true });
   }
-  function saveTodos(todos){
-    localStorage.setItem('todos', JSON.stringify(todos));
+
+  function setAuthUI(user, username){
+    isAuthed = !!user;
+    document.body.classList.toggle('authed', isAuthed);
+    authForms.hidden = isAuthed;
+    authUser.hidden = !isAuthed;
+    authSignoutBtn.hidden = !isAuthed;
+    authUsernameDisplay.textContent = username || '';
+    if (!isAuthed) syncStatusEl.textContent = '';
   }
+
+  function applyCheckboxes(checkboxes){
+    applyingRemote = true;
+    document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+      cb.checked = !!checkboxes[cb.id];
+    });
+    applyingRemote = false;
+  }
+
+  function collectCheckboxes(){
+    const checkboxes = {};
+    document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+      checkboxes[cb.id] = cb.checked;
+    });
+    return checkboxes;
+  }
+
   function renderTodos(){
-    const todos = loadTodos();
     listEl.innerHTML = '';
+    if (!isAuthed) return;
+    const todos = appData.todos;
     if (todos.length === 0){
-      listEl.innerHTML = '<div class="empty">Aucune tâche pour l\'instant — ajoute la première ci-dessus.</div>';
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Aucune tâche pour l\'instant — ajoute la première ci-dessus.';
+      listEl.appendChild(empty);
       return;
     }
     todos.forEach((t, i) => {
       const row = document.createElement('div');
       row.className = 'todo-line' + (t.done ? ' done' : '');
-      row.innerHTML = `
-        <input type="checkbox" ${t.done ? 'checked' : ''} data-i="${i}" class="todo-check">
-        <span class="subj-dot" style="background:${subjColors[t.subject] || 'var(--ink-soft)'}"></span>
-        <label>${t.text} <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);">· ${subjLabels[t.subject] || ''}</span></label>
-        <button class="del" data-i="${i}">✕</button>
-      `;
+
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.className = 'todo-check';
+      check.dataset.i = String(i);
+      check.checked = !!t.done;
+
+      const dot = document.createElement('span');
+      dot.className = 'subj-dot';
+      dot.style.background = subjColors[t.subject] || 'var(--ink-soft)';
+
+      const label = document.createElement('label');
+      label.appendChild(document.createTextNode(t.text + ' '));
+      const subj = document.createElement('span');
+      subj.style.fontFamily = "'IBM Plex Mono',monospace";
+      subj.style.fontSize = '10.5px';
+      subj.style.color = 'var(--ink-soft)';
+      subj.textContent = '· ' + (subjLabels[t.subject] || '');
+      label.appendChild(subj);
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.dataset.i = String(i);
+      del.textContent = '✕';
+
+      row.append(check, dot, label, del);
       listEl.appendChild(row);
     });
   }
+
+  function applyAllData(data){
+    appData = {
+      todos: Array.isArray(data.todos) ? data.todos : [],
+      checkboxes: data.checkboxes && typeof data.checkboxes === 'object' ? data.checkboxes : {},
+      schedule: data.schedule && typeof data.schedule === 'object' ? data.schedule : {}
+    };
+    renderTodos();
+    applyCheckboxes(appData.checkboxes);
+    applyScheduleToInputs();
+  }
+
   listEl.addEventListener('click', (e) => {
-    if (e.target.classList.contains('todo-check')){
-      const todos = loadTodos();
-      const i = +e.target.dataset.i;
-      todos[i].done = e.target.checked;
-      saveTodos(todos);
+    if (!isAuthed) return;
+    const target = e.target;
+    if (target.classList.contains('todo-check')){
+      const i = +target.dataset.i;
+      appData.todos[i].done = target.checked;
+      window.CarnetSync.saveField('todos', appData.todos);
       renderTodos();
     }
-    if (e.target.classList.contains('del')){
-      const todos = loadTodos();
-      const i = +e.target.dataset.i;
-      todos.splice(i, 1);
-      saveTodos(todos);
+    if (target.classList.contains('del')){
+      const i = +target.dataset.i;
+      appData.todos.splice(i, 1);
+      window.CarnetSync.saveField('todos', appData.todos);
       renderTodos();
     }
   });
+
   function addTodo(){
+    if (!isAuthed) return;
     const text = input.value.trim();
     if (!text) return;
-    const todos = loadTodos();
-    todos.push({ text, subject: subjSelect.value, done:false });
-    saveTodos(todos);
+    appData.todos.push({ text, subject: subjSelect.value, done: false });
+    window.CarnetSync.saveField('todos', appData.todos);
     input.value = '';
     renderTodos();
   }
   addBtn.addEventListener('click', addTodo);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
 
-  renderTodos();
+  document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (!isAuthed || applyingRemote) return;
+      appData.checkboxes = collectCheckboxes();
+      window.CarnetSync.saveField('checkboxes', appData.checkboxes);
+    });
+  });
 
-  // Dark mode
+  // Dark mode (local only)
   const modeBtn = document.getElementById('mode-toggle');
   function setMode(dark){
     document.body.classList.toggle('dark', dark);
@@ -738,7 +967,7 @@
   setMode(localStorage.getItem('dark-mode') === '1');
   modeBtn.addEventListener('click', () => setMode(!document.body.classList.contains('dark')));
 
-  // Schedule placeholder grid
+  // Schedule grid
   const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
   const slots = ['8h–9h','9h–10h','10h–11h','11h–12h','13h–14h','14h–15h','15h–16h','16h–17h','17h–18h'];
   const theadRow = document.querySelector('#schedule-table thead tr');
@@ -749,7 +978,7 @@
     theadRow.appendChild(th);
   });
 
-  const schedule = JSON.parse(localStorage.getItem('schedule') || '{}');
+  const scheduleInputs = {};
   const tbody = document.getElementById('schedule-body');
   slots.forEach((slot, r) => {
     const tr = document.createElement('tr');
@@ -764,42 +993,394 @@
       cellInput.type = 'text';
       cellInput.placeholder = '—';
       const key = r + '-' + c;
-      cellInput.value = schedule[key] || '';
+      cellInput.dataset.key = key;
       cellInput.style.cssText = "width:100%; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size:12.5px; padding:8px 8px; color:var(--ink); outline:none;";
       cellInput.addEventListener('input', () => {
-        schedule[key] = cellInput.value;
-        localStorage.setItem('schedule', JSON.stringify(schedule));
+        if (!isAuthed || applyingRemote) return;
+        appData.schedule[key] = cellInput.value;
+        window.CarnetSync.saveField('schedule', appData.schedule);
       });
       cellInput.addEventListener('focus', () => td.style.background = 'var(--paper)');
       cellInput.addEventListener('blur', () => td.style.background = 'transparent');
       td.appendChild(cellInput);
       tr.appendChild(td);
+      scheduleInputs[key] = cellInput;
     });
     tbody.appendChild(tr);
+  });
+
+  function applyScheduleToInputs(){
+    applyingRemote = true;
+    Object.keys(scheduleInputs).forEach(key => {
+      scheduleInputs[key].value = appData.schedule[key] || '';
+    });
+    applyingRemote = false;
+  }
+
+  // Auth UI
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const isLogin = tab.dataset.authTab === 'login';
+      document.getElementById('auth-login').hidden = !isLogin;
+      document.getElementById('auth-signup').hidden = isLogin;
+      document.getElementById('login-error').hidden = true;
+      document.getElementById('signup-error').hidden = true;
+    });
+  });
+
+  function showAuthError(el, msg){
+    el.textContent = msg;
+    el.hidden = !msg;
+  }
+
+  document.getElementById('auth-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('login-error');
+    showAuthError(errEl, '');
+    try {
+      await window.CarnetSync.signIn(
+        document.getElementById('login-username').value,
+        document.getElementById('login-password').value
+      );
+    } catch (err) {
+      showAuthError(errEl, err.message);
+    }
+  });
+
+  document.getElementById('auth-signup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('signup-error');
+    showAuthError(errEl, '');
+    const pw = document.getElementById('signup-password').value;
+    const pw2 = document.getElementById('signup-password2').value;
+    if (pw !== pw2){
+      showAuthError(errEl, 'Les mots de passe ne correspondent pas.');
+      return;
+    }
+    try {
+      await window.CarnetSync.signUp(
+        document.getElementById('signup-username').value,
+        pw,
+        document.getElementById('signup-school').value
+      );
+    } catch (err) {
+      showAuthError(errEl, err.message);
+    }
+  });
+
+  authSignoutBtn.addEventListener('click', () => window.CarnetSync.signOut());
+
+  whenSyncReady(() => {
+    window.CarnetSync.onAuthChange(({ user, username }) => {
+      setAuthUI(user, username);
+      if (!user){
+        appData = { todos: [], checkboxes: {}, schedule: {} };
+        renderTodos();
+        applyCheckboxes({});
+        applyScheduleToInputs();
+      }
+    });
+
+    window.CarnetSync.onDataChange((data) => {
+      applyAllData(data);
+    });
+
+    window.CarnetSync.onStatusChange((status) => {
+      syncStatusEl.className = 'sync-status' + (status ? ' ' + status : '');
+      if (status === 'saving') syncStatusEl.textContent = 'Enregistrement…';
+      else if (status === 'synced') syncStatusEl.textContent = 'Synchronisé';
+      else if (status === 'offline') syncStatusEl.textContent = 'Hors ligne';
+      else syncStatusEl.textContent = '';
+    });
   });
 </script>
 
 <script type="module">
-  // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    serverTimestamp,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const SCHOOL_CODE = 'CLIFF2026';
+  const FIRESTORE_COLLECTION = 'users';
+  const EMAIL_DOMAIN = '@cliffschool.local';
+
   const firebaseConfig = {
     apiKey: "AIzaSyB37EjVM8YCx6oiDcNWPYe-qzjrRNgtHNc",
     authDomain: "cliffschool.firebaseapp.com",
     projectId: "cliffschool",
     storageBucket: "cliffschool.firebasestorage.app",
     messagingSenderId: "725275517762",
-    appId: "1:725275517762:web:8e10497782e2705c2d1edb",
+    appId: "1:725275517762:web:8e10497782e2705c2d1ebd",
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  try {
+    const { getAnalytics } = await import("https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js");
+    getAnalytics(app);
+  } catch (_) { /* Analytics optionnel */ }
+
+  let currentUser = null;
+  let userData = { todos: [], checkboxes: {}, schedule: {} };
+  let username = '';
+  let unsubSnapshot = null;
+  let saveTimers = {};
+  let syncStatus = '';
+  let applyingSnapshot = false;
+  let migrated = false;
+
+  const authCallbacks = [];
+  const dataCallbacks = [];
+  const statusCallbacks = [];
+
+  function normalizeUsername(raw){
+    return raw.trim().toLowerCase().replace(/\s/g, '');
+  }
+
+  function validateUsername(raw){
+    return /^[a-zA-Z0-9_-]{3,20}$/.test(raw.trim());
+  }
+
+  function toEmail(raw){
+    return normalizeUsername(raw) + EMAIL_DOMAIN;
+  }
+
+  function authErrorMessage(code){
+    const map = {
+      'auth/wrong-password': 'Mot de passe incorrect.',
+      'auth/invalid-credential': 'Identifiant ou mot de passe incorrect.',
+      'auth/user-not-found': 'Identifiant inconnu.',
+      'auth/email-already-in-use': 'Identifiant déjà pris.',
+      'auth/weak-password': 'Mot de passe trop court (6 caractères minimum).',
+      'auth/invalid-email': 'Identifiant invalide.',
+      'auth/too-many-requests': 'Trop de tentatives — réessaie dans quelques minutes.',
+      'auth/network-request-failed': 'Hors ligne — réessaie quand tu es connecté.'
+    };
+    return map[code] || 'Une erreur est survenue — réessaie.';
+  }
+
+  function setStatus(status){
+    syncStatus = status;
+    statusCallbacks.forEach(fn => fn(status));
+  }
+
+  function notifyData(){
+    dataCallbacks.forEach(fn => fn({ ...userData }));
+  }
+
+  function notifyAuth(){
+    authCallbacks.forEach(fn => fn({ user: currentUser, username }));
+  }
+
+  function collectLocalData(){
+    let todos = [];
+    try { todos = JSON.parse(localStorage.getItem('todos') || '[]'); } catch (_) {}
+    let schedule = {};
+    try { schedule = JSON.parse(localStorage.getItem('schedule') || '{}'); } catch (_) {}
+    const checkboxes = {};
+    document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+      const val = localStorage.getItem('chk-' + cb.id);
+      if (val === '1') checkboxes[cb.id] = true;
+      else if (val === '0') checkboxes[cb.id] = false;
+    });
+    return { todos, schedule, checkboxes };
+  }
+
+  function hasLocalUserData(local){
+    if (local.todos && local.todos.length) return true;
+    if (local.schedule && Object.keys(local.schedule).some(k => local.schedule[k])) return true;
+    if (local.checkboxes && Object.values(local.checkboxes).some(v => v)) return true;
+    return false;
+  }
+
+  function mergeData(cloud, local){
+    const merged = {
+      todos: Array.isArray(cloud.todos) ? [...cloud.todos] : [],
+      checkboxes: { ...(local.checkboxes || {}), ...(cloud.checkboxes || {}) },
+      schedule: { ...(local.schedule || {}), ...(cloud.schedule || {}) }
+    };
+    if (!merged.todos.length && local.todos && local.todos.length){
+      merged.todos = local.todos;
+    }
+    return merged;
+  }
+
+  function clearLocalUserData(){
+    localStorage.removeItem('todos');
+    localStorage.removeItem('schedule');
+    document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+      localStorage.removeItem('chk-' + cb.id);
+    });
+  }
+
+  async function ensureUserDoc(uid, displayUsername){
+    const ref = doc(db, FIRESTORE_COLLECTION, uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()){
+      await setDoc(ref, {
+        username: displayUsername,
+        todos: [],
+        checkboxes: {},
+        schedule: {},
+        updatedAt: serverTimestamp()
+      });
+    }
+    return ref;
+  }
+
+  async function loadAndSubscribe(uid){
+    const ref = doc(db, FIRESTORE_COLLECTION, uid);
+    if (unsubSnapshot) unsubSnapshot();
+
+    const snap = await getDoc(ref);
+    let cloud = snap.exists() ? snap.data() : { todos: [], checkboxes: {}, schedule: {} };
+    username = cloud.username || '';
+
+    if (!migrated){
+      const local = collectLocalData();
+      if (hasLocalUserData(local)){
+        const merged = mergeData(cloud, local);
+        await setDoc(ref, {
+          ...merged,
+          username: username || currentUser.email.split('@')[0],
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        cloud = merged;
+        clearLocalUserData();
+      }
+      migrated = true;
+    }
+
+    userData = {
+      todos: Array.isArray(cloud.todos) ? cloud.todos : [],
+      checkboxes: cloud.checkboxes || {},
+      schedule: cloud.schedule || {}
+    };
+    notifyData();
+
+    unsubSnapshot = onSnapshot(ref, (docSnap) => {
+      if (!docSnap.exists()) return;
+      applyingSnapshot = true;
+      const data = docSnap.data();
+      username = data.username || username;
+      userData = {
+        todos: Array.isArray(data.todos) ? data.todos : [],
+        checkboxes: data.checkboxes || {},
+        schedule: data.schedule || {}
+      };
+      notifyData();
+      notifyAuth();
+      applyingSnapshot = false;
+      setStatus('synced');
+    }, () => {
+      setStatus('offline');
+    });
+
+    setStatus('synced');
+  }
+
+  async function persistField(field, value){
+    if (!currentUser || applyingSnapshot) return;
+    userData[field] = value;
+    setStatus('saving');
+    try {
+      const ref = doc(db, FIRESTORE_COLLECTION, currentUser.uid);
+      await updateDoc(ref, {
+        [field]: value,
+        updatedAt: serverTimestamp()
+      });
+      setStatus('synced');
+    } catch (err) {
+      if (!navigator.onLine) setStatus('offline');
+      else setStatus('offline');
+      throw new Error('Hors ligne — réessaie.');
+    }
+  }
+
+  function queueSaveField(field, value){
+    if (field === 'schedule'){
+      clearTimeout(saveTimers.schedule);
+      saveTimers.schedule = setTimeout(() => persistField(field, value), 400);
+      return;
+    }
+    persistField(field, value);
+  }
+
+  window.CarnetSync = {
+    onAuthChange(fn){ authCallbacks.push(fn); },
+    onDataChange(fn){ dataCallbacks.push(fn); },
+    onStatusChange(fn){ statusCallbacks.push(fn); fn(syncStatus); },
+    async signIn(rawUsername, password){
+      if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+      try {
+        await signInWithEmailAndPassword(auth, toEmail(rawUsername), password);
+      } catch (err) {
+        throw new Error(authErrorMessage(err.code));
+      }
+    },
+    async signUp(rawUsername, password, schoolCode){
+      if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+      if (schoolCode.trim() !== SCHOOL_CODE) throw new Error('Code école incorrect.');
+      if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, toEmail(rawUsername), password);
+        await setDoc(doc(db, FIRESTORE_COLLECTION, cred.user.uid), {
+          username: rawUsername.trim(),
+          todos: [],
+          checkboxes: {},
+          schedule: {},
+          updatedAt: serverTimestamp()
+        });
+      } catch (err) {
+        throw new Error(authErrorMessage(err.code));
+      }
+    },
+    signOut(){
+      return signOut(auth);
+    },
+    saveField(field, value){
+      queueSaveField(field, value);
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if (user){
+      try {
+        await ensureUserDoc(user.uid, user.email.split('@')[0]);
+        await loadAndSubscribe(user.uid);
+      } catch (_) {
+        setStatus('offline');
+      }
+    } else {
+      if (unsubSnapshot){ unsubSnapshot(); unsubSnapshot = null; }
+      userData = { todos: [], checkboxes: {}, schedule: {} };
+      username = '';
+      migrated = false;
+      setStatus('');
+    }
+    notifyAuth();
+  });
+
+  window.dispatchEvent(new Event('carnet-sync-ready'));
 </script>
 
 </body>
