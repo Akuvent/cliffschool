@@ -1,4 +1,7 @@
 firebase-debug.log
+.firebase/
+*-firebase-adminsdk-*.json
+serviceAccount*.json
 .env
 .env.*
 *.pem
