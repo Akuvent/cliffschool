@@ -31,6 +31,11 @@ gcloud iam service-accounts add-iam-policy-binding "${SA}@${PROJECT_ID}.iam.gser
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github/attribute.repository/${REPO}"
 
+gcloud iam service-accounts add-iam-policy-binding "${SA}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --project="$PROJECT_ID" \
+  --role="roles/iam.serviceAccountTokenCreator" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github/attribute.repository/${REPO}"
+
 echo ""
 echo "Done. PROJECT_NUMBER=${PROJECT_NUMBER}"
 echo "Add this to .github/workflows/firebase-hosting-merge.yml if not already set."
