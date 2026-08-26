@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnet de Terminale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3E9;
+    --paper-dark:#EFE9D8;
+    --ink:#243350;
+    --ink-soft:#5B6785;
+    --red:#C1443D;
+    --yellow:#F0C93B;
+    --grid:#D7E2EE;
+    --line:#C9BFA6;
+
+    --c-math:#4C6EF5;
+    --c-nsi:#12B886;
+    --c-philo:#8B5CF6;
+    --c-phys:#E8590C;
+    --c-sport:#F08C00;
+    --c-eng:#1C7ED6;
+    --c-ger:#2F9E44;
+    --c-res:#C1443D;
+  }
+
+  body.dark{
+    --paper:#1B2030;
+    --paper-dark:#242B40;
+    --ink:#EDEBE2;
+    --ink-soft:#9AA3C0;
+    --red:#E8746B;
+    --yellow:#F0C93B;
+    --grid:#2A314A;
+    --line:#3A4260;
+  }
+  body.dark main{
+    background:#161A28;
+  }
+  body.dark .res-card,
+  body.dark .today-input input[type=text],
+  body.dark .today-input select,
+  body.dark .chapter summary{
+    background:var(--paper);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px,
+      var(--paper);
+    min-height:100vh;
+    padding-bottom:60px;
+    transition:background-color .2s ease, color .2s ease;
+  }
+  main, .res-card, .chapter summary, .chapter, .today-input input, .today-input select, .todo-line{
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease;
+  }
+
+  .mode-toggle{
+    position:absolute;
+    top:52px; right:40px;
+    z-index:3;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .mode-toggle:hover{ border-color:var(--ink-soft); }
+  @media (max-width:640px){
+    .mode-toggle{ position:static; margin:16px 18px 0 54px; display:inline-flex; }
+  }
+
+  /* punch holes along the left edge, like a real binder page */
+  body::before{
+    content:"";
+    position:fixed;
+    top:0; bottom:0; left:18px;
+    width:14px;
+    background-image: radial-gradient(circle, var(--paper-dark) 5px, transparent 5.5px);
+    background-size: 14px 70px;
+    background-repeat: repeat-y;
+    background-position: 0 40px;
+    z-index:1;
+    pointer-events:none;
+    opacity:0.9;
+  }
+  body::after{
+    content:"";
+    position:fixed;
+    top:0; bottom:0; left:0;
+    width:46px;
+    border-right:1.5px dashed var(--line);
+    z-index:0;
+    pointer-events:none;
+  }
+
+  header{
+    position:relative;
+    padding:52px 40px 30px 76px;
+    z-index:2;
+  }
+  header .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(34px, 5vw, 54px);
+    line-height:1.05;
+    color:var(--ink);
+  }
+  header h1 em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--red);
+    position:relative;
+  }
+  header p.sub{
+    margin-top:14px;
+    max-width:560px;
+    color:var(--ink-soft);
+    font-size:15.5px;
+    line-height:1.5;
+  }
+
+  nav.tabs{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:0 40px 0 76px;
+    margin-bottom:10px;
+  }
+  .tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    padding:10px 16px 12px;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    border-radius:8px 8px 0 0;
+    transform:translateY(6px);
+    transition:transform .15s ease, opacity .15s ease;
+    opacity:0.72;
+    box-shadow: 0 -1px 0 rgba(0,0,0,0.08) inset;
+  }
+  .tab:hover{ opacity:0.9; }
+  .tab.active{
+    opacity:1;
+    transform:translateY(0);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .tab[data-tab="math"]{ background:var(--c-math); }
+  .tab[data-tab="nsi"]{ background:var(--c-nsi); }
+  .tab[data-tab="philo"]{ background:var(--c-philo); }
+  .tab[data-tab="phys"]{ background:var(--c-phys); }
+  .tab[data-tab="sport"]{ background:var(--c-sport); }
+  .tab[data-tab="eng"]{ background:var(--c-eng); }
+  .tab[data-tab="ger"]{ background:var(--c-ger); }
+  .tab[data-tab="today"]{ background:var(--ink); }
+  .tab[data-tab="edt"]{ background:#5C5F66; }
+  .tab[data-tab="res"]{ background:var(--c-res); }
+
+  main{
+    position:relative;
+    z-index:2;
+    margin:0 40px 0 76px;
+    background:#fffdf8;
+    border:1.5px solid var(--line);
+    border-radius:2px 14px 14px 14px;
+    box-shadow: 0 12px 30px rgba(36,51,80,0.08);
+    min-height:420px;
+    padding:38px 40px 44px;
+  }
+
+  .panel{ display:none; animation:fade .25s ease; }
+  .panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .panel .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:20px;
+    color:#fff;
+    margin-bottom:18px;
+  }
+
+  .chapter{
+    border:1px solid var(--paper-dark);
+    border-radius:10px;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .chapter summary{
+    list-style:none;
+    cursor:pointer;
+    padding:14px 18px;
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:500;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--paper);
+  }
+  .chapter summary::-webkit-details-marker{ display:none; }
+  .chapter summary::after{
+    content:"+";
+    font-family:'IBM Plex Mono', monospace;
+    font-size:18px;
+    color:var(--ink-soft);
+  }
+  .chapter[open] summary::after{ content:"–"; }
+  .chapter .body{ padding:6px 18px 16px; }
+  .todo-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 0;
+    font-size:14.5px;
+    border-bottom:1px dashed var(--paper-dark);
+  }
+  .todo-line:last-child{ border-bottom:none; }
+  .todo-line input[type=checkbox]{
+    width:17px; height:17px;
+    accent-color:var(--red);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .todo-line label{ cursor:pointer; }
+  .todo-line.done label{ color:var(--ink-soft); text-decoration:line-through; }
+
+  .note{
+    margin-top:18px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:var(--paper);
+    border-left:3px solid var(--yellow);
+    padding:12px 16px;
+    border-radius:0 8px 8px 0;
+  }
+
+  /* Today panel */
+  .today-input{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .today-input input[type=text]{
+    flex:1;
+    font-family:'Work Sans', sans-serif;
+    font-size:14.5px;
+    padding:11px 14px;
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    background:var(--paper);
+  }
+  .today-input select{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:0 10px;
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    background:var(--paper);
+  }
+  .today-input button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:0 20px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  #todo-list .todo-line{ font-size:15px; padding:10px 0; }
+  #todo-list .subj-dot{
+    width:9px; height:9px; border-radius:50%; flex-shrink:0;
+  }
+  #todo-list .del{
+    margin-left:auto;
+    background:none; border:none; color:var(--ink-soft);
+    cursor:pointer; font-size:16px; opacity:0.5;
+  }
+  #todo-list .del:hover{ opacity:1; color:var(--red); }
+  .empty{ color:var(--ink-soft); font-size:14px; font-style:italic; padding:14px 0; }
+
+  /* Resources panel */
+  .res-group{ margin-bottom:28px; }
+  .res-group h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .res-group h3::before{
+    content:"";
+    width:10px; height:10px;
+    border-radius:50%;
+    display:inline-block;
+  }
+  .res-group.math h3::before{ background:var(--c-math); }
+  .res-group.nsi h3::before{ background:var(--c-nsi); }
+  .res-group.other h3::before{ background:var(--ink-soft); }
+  .res-group.tools h3::before{ background:var(--yellow); }
+
+  .res-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:12px;
+  }
+  .res-card{
+    display:block;
+    border:1.5px solid var(--paper-dark);
+    border-radius:10px;
+    padding:14px 16px;
+    text-decoration:none;
+    color:var(--ink);
+    background:var(--paper);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .res-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(36,51,80,0.1);
+    border-color:var(--ink-soft);
+  }
+  .res-card .name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:15.5px;
+    margin-bottom:4px;
+  }
+  .res-card .desc{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.4;
+  }
+  .res-card .url{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--red);
+    margin-top:8px;
+    display:block;
+  }
+
+  footer{
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:30px;
+    padding-left:76px;
+  }
+
+  @media (max-width:640px){
+    header{ padding:40px 18px 24px 54px; }
+    nav.tabs{ padding:0 18px 0 54px; }
+    main{ margin:0 18px 0 54px; padding:24px 18px 30px; }
+    footer{ padding-left:54px; }
+    body::before{ left:10px; width:10px; background-size:10px 60px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="mode-toggle" id="mode-toggle">☾ &nbsp;Mode sombre</button>
+  <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
+  <h1>Carnet de <em>Terminale</em></h1>
+  <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="today">Aujourd'hui</button>
+  <button class="tab" data-tab="math">Maths</button>
+  <button class="tab" data-tab="nsi">NSI</button>
+  <button class="tab" data-tab="philo">Philo</button>
+  <button class="tab" data-tab="phys">Physique-Chimie</button>
+  <button class="tab" data-tab="eng">Anglais</button>
+  <button class="tab" data-tab="ger">Allemand</button>
+  <button class="tab" data-tab="sport">Sport</button>
+  <button class="tab" data-tab="edt">Emploi du temps</button>
+  <button class="tab" data-tab="res">Ressources</button>
+</nav>
+
+<main>
+
+  <!-- TODAY -->
+  <section class="panel active" id="panel-today">
+    <h2>Aujourd'hui</h2>
+    <span class="tag" style="background:var(--ink)">Liste du jour</span>
+    <div class="today-input">
+      <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
+      <select id="todo-subject">
+        <option value="math">Maths</option>
+        <option value="nsi">NSI</option>
+        <option value="philo">Philo</option>
+        <option value="phys">Physique-Chimie</option>
+        <option value="eng">Anglais</option>
+        <option value="ger">Allemand</option>
+        <option value="sport">Sport</option>
+      </select>
+      <button id="todo-add">Ajouter</button>
+    </div>
+    <div id="todo-list"></div>
+    <div class="note">Cette liste est sauvegardée directement sur cet appareil (localStorage). Pour une vraie synchro PC ↔ téléphone, utilise ton espace Notion — cette page est un tableau de bord d'appoint.</div>
+  </section>
+
+  <!-- MATH -->
+  <section class="panel" id="panel-math">
+    <h2>Maths — avance de rentrée</h2>
+    <span class="tag" style="background:var(--c-math)">Spécialité</span>
+
+    <details class="chapter" open>
+      <summary>Suites numériques</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="m1"><label for="m1">Revoir suites arithmétiques / géométriques</label></div>
+        <div class="todo-line"><input type="checkbox" id="m2"><label for="m2">Limites de suites</label></div>
+        <div class="todo-line"><input type="checkbox" id="m3"><label for="m3">Raisonnement par récurrence</label></div>
+        <div class="todo-line"><input type="checkbox" id="m4"><label for="m4">Exercices d'application</label></div>
+      </div>
+    </details>
+
+    <details class="chapter">
+      <summary>Dérivation (rappels &amp; approfondissement)</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="m5"><label for="m5">Rappels des règles de dérivation</label></div>
+        <div class="todo-line"><input type="checkbox" id="m6"><label for="m6">Étude complète de fonctions</label></div>
+        <div class="todo-line"><input type="checkbox" id="m7"><label for="m7">Convexité</label></div>
+      </div>
+    </details>
+
+    <details class="chapter">
+      <summary>Fonction exponentielle</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="m8"><label for="m8">Propriétés de la fonction exponentielle</label></div>
+        <div class="todo-line"><input type="checkbox" id="m9"><label for="m9">Équations et inéquations</label></div>
+      </div>
+    </details>
+
+    <details class="chapter">
+      <summary>Boîte à outils fonctions</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="m10"><label for="m10">Variations, limites, composition</label></div>
+      </div>
+    </details>
+    <div class="note">Coche au fur et à mesure — l'état est sauvegardé automatiquement sur cet appareil.</div>
+  </section>
+
+  <!-- NSI -->
+  <section class="panel" id="panel-nsi">
+    <h2>NSI — avance de rentrée</h2>
+    <span class="tag" style="background:var(--c-nsi)">Spécialité</span>
+
+    <details class="chapter" open>
+      <summary>Récursivité</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="n1"><label for="n1">Comprendre le principe de récursivité</label></div>
+        <div class="todo-line"><input type="checkbox" id="n2"><label for="n2">Écrire des fonctions récursives simples</label></div>
+        <div class="todo-line"><input type="checkbox" id="n3"><label for="n3">Exercices</label></div>
+      </div>
+    </details>
+
+    <details class="chapter">
+      <summary>Structures de données (piles, files)</summary>
+      <div class="body">
+        <div class="todo-line"><input type="checkbox" id="n4"><label for="n4">Piles (LIFO)</label></div>
+        <div class="todo-line"><input type="checkbox" id="n5"><label for="n5">Files (FIFO)</label></div>
+        <div class="todo-line"><input type="checkbox" id="n6"><label for="n6">Exercices</label></div>
+      </div>
+    </details>
+    <div class="note">Ces deux thèmes reviennent tout au long de l'année en NSI — les voir en avance rend tout le reste plus facile.</div>
+  </section>
+
+  <!-- PHILO -->
+  <section class="panel" id="panel-philo">
+    <h2>Philosophie</h2>
+    <span class="tag" style="background:var(--c-philo)">Tronc commun</span>
+    <div class="note">Pas de programme figé à l'avance ici — mais tu peux profiter de la semaine pour lire un texte court (Sénèque, Épictète...) sans pression, juste pour prendre goût à la discipline avant la rentrée.</div>
+  </section>
+
+  <!-- PHYSIQUE -->
+  <section class="panel" id="panel-phys">
+    <h2>Physique-Chimie</h2>
+    <span class="tag" style="background:var(--c-phys)">Tronc commun</span>
+    <div class="note">Repasser sur les unités, la mécanique de Première et les calculs de concentration peut suffire pour bien démarrer — pas besoin de tout revoir en profondeur.</div>
+  </section>
+
+  <!-- ENGLISH -->
+  <section class="panel" id="panel-eng">
+    <h2>Anglais</h2>
+    <span class="tag" style="background:var(--c-eng)">LV1</span>
+    <div class="note">Un peu tous les jours (podcast, série en VO, vocabulaire) marche mieux qu'une révision groupée. Aucune préparation particulière nécessaire avant la rentrée.</div>
+  </section>
+
+  <!-- GERMAN -->
+  <section class="panel" id="panel-ger">
+    <h2>Allemand</h2>
+    <span class="tag" style="background:var(--c-ger)">LV2</span>
+    <div class="note">Même logique qu'en anglais : régularité plutôt qu'intensité. Une chanson ou une vidéo courte en allemand de temps en temps suffit.</div>
+  </section>
+
+  <!-- SPORT -->
+  <section class="panel" id="panel-sport">
+    <h2>Sport (EPS)</h2>
+    <span class="tag" style="background:var(--c-sport)">Tronc commun</span>
+    <div class="note">Rien à préparer — profite de cette semaine pour te reposer et arriver en forme à la rentrée !</div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="panel" id="panel-edt">
+    <h2>Emploi du temps</h2>
+    <span class="tag" style="background:#5C5F66">À compléter à la rentrée</span>
+    <div class="note" style="margin-bottom:20px;">Emplacement réservé — tu n'as pas encore ton emploi du temps définitif. Clique dans une case pour noter un cours une fois qu'il te sera donné (ex. "Maths — salle 12"). Tout se sauvegarde automatiquement.</div>
+    <div style="overflow-x:auto;">
+      <table id="schedule-table" style="border-collapse:collapse; width:100%; min-width:680px; font-size:13px;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;">Créneau</th>
+          </tr>
+        </thead>
+        <tbody id="schedule-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="panel" id="panel-res">
+    <h2>Ressources conseillées</h2>
+    <span class="tag" style="background:var(--c-res)">Sites &amp; chaînes gratuites</span>
+
+    <div class="res-group math">
+      <h3>Maths</h3>
+      <div class="res-grid">
+        <a class="res-card" href="https://www.maths-et-tiques.fr/" target="_blank" rel="noopener">
+          <div class="name">Maths et tiques</div>
+          <div class="desc">Cours complets, fiches méthode et exercices corrigés par Yvan Monka, du collège à la Terminale.</div>
+          <span class="url">maths-et-tiques.fr</span>
+        </a>
+        <a class="res-card" href="https://www.youtube.com/@YMONKA" target="_blank" rel="noopener">
+          <div class="name">Yvan Monka (YouTube)</div>
+          <div class="desc">Plus de 1900 vidéos de cours classées par niveau et par chapitre — la référence pour réviser en vidéo.</div>
+          <span class="url">youtube.com/@YMONKA</span>
+        </a>
+        <a class="res-card" href="https://www.youtube.com/@Mathrix" target="_blank" rel="noopener">
+          <div class="name">Mathrix</div>
+          <div class="desc">Chaîne YouTube avec des cours clairs et des astuces de méthode pour le lycée.</div>
+          <span class="url">youtube.com/@Mathrix</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="res-group nsi">
+      <h3>NSI</h3>
+      <div class="res-grid">
+        <a class="res-card" href="https://www.lesbonsprofs.com/" target="_blank" rel="noopener">
+          <div class="name">Les Bons Profs</div>
+          <div class="desc">Vidéos de cours de spécialité NSI couvrant l'ensemble du programme de Terminale.</div>
+          <span class="url">lesbonsprofs.com</span>
+        </a>
+        <a class="res-card" href="https://cgouygou.github.io/TNSI/" target="_blank" rel="noopener">
+          <div class="name">Cours de Terminale NSI</div>
+          <div class="desc">Site de cours structuré par thème du programme officiel, avec exercices et corrections.</div>
+          <span class="url">cgouygou.github.io/TNSI</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="res-group tools">
+      <h3>Organisation</h3>
+      <div class="res-grid">
+        <a class="res-card" href="https://calendar.google.com/" target="_blank" rel="noopener">
+          <div class="name">Google Calendar</div>
+          <div class="desc">Pour ton emploi du temps fixe, synchronisé entre PC et téléphone.</div>
+          <span class="url">calendar.google.com</span>
+        </a>
+        <a class="res-card" href="https://todoist.com/" target="_blank" rel="noopener">
+          <div class="name">Todoist</div>
+          <div class="desc">Listes de tâches quotidiennes avec rappels et tâches récurrentes, gratuit.</div>
+          <span class="url">todoist.com</span>
+        </a>
+        <a class="res-card" href="https://www.notion.com/" target="_blank" rel="noopener">
+          <div class="name">Notion</div>
+          <div class="desc">Ton espace déjà configuré pour les matières, tâches et calendrier.</div>
+          <span class="url">notion.com</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="note">Tous ces liens ouvrent un nouvel onglet. Si un site te semble payant ou peu fiable, ferme-le et reviens ici — ces sélections sont toutes gratuites et largement utilisées par des lycéens français.</div>
+  </section>
+
+</main>
+
+<footer>carnet de terminale · fait pour la rentrée</footer>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Persist chapter checkboxes
+  document.querySelectorAll('.chapter input[type=checkbox]').forEach(cb => {
+    const key = 'chk-' + cb.id;
+    const saved = localStorage.getItem(key);
+    if (saved === '1') cb.checked = true;
+    cb.addEventListener('change', () => {
+      localStorage.setItem(key, cb.checked ? '1' : '0');
+    });
+  });
+
+  // Today to-do list
+  const subjColors = {
+    math:'var(--c-math)', nsi:'var(--c-nsi)', philo:'var(--c-philo)',
+    phys:'var(--c-phys)', eng:'var(--c-eng)', ger:'var(--c-ger)', sport:'var(--c-sport)'
+  };
+  const subjLabels = {
+    math:'Maths', nsi:'NSI', philo:'Philo', phys:'Physique-Chimie',
+    eng:'Anglais', ger:'Allemand', sport:'Sport'
+  };
+
+  const listEl = document.getElementById('todo-list');
+  const input = document.getElementById('todo-text');
+  const subjSelect = document.getElementById('todo-subject');
+  const addBtn = document.getElementById('todo-add');
+
+  function loadTodos(){
+    try { return JSON.parse(localStorage.getItem('todos') || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveTodos(todos){
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+  function renderTodos(){
+    const todos = loadTodos();
+    listEl.innerHTML = '';
+    if (todos.length === 0){
+      listEl.innerHTML = '<div class="empty">Aucune tâche pour l\'instant — ajoute la première ci-dessus.</div>';
+      return;
+    }
+    todos.forEach((t, i) => {
+      const row = document.createElement('div');
+      row.className = 'todo-line' + (t.done ? ' done' : '');
+      row.innerHTML = `
+        <input type="checkbox" ${t.done ? 'checked' : ''} data-i="${i}" class="todo-check">
+        <span class="subj-dot" style="background:${subjColors[t.subject] || 'var(--ink-soft)'}"></span>
+        <label>${t.text} <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);">· ${subjLabels[t.subject] || ''}</span></label>
+        <button class="del" data-i="${i}">✕</button>
+      `;
+      listEl.appendChild(row);
+    });
+  }
+  listEl.addEventListener('click', (e) => {
+    if (e.target.classList.contains('todo-check')){
+      const todos = loadTodos();
+      const i = +e.target.dataset.i;
+      todos[i].done = e.target.checked;
+      saveTodos(todos);
+      renderTodos();
+    }
+    if (e.target.classList.contains('del')){
+      const todos = loadTodos();
+      const i = +e.target.dataset.i;
+      todos.splice(i, 1);
+      saveTodos(todos);
+      renderTodos();
+    }
+  });
+  function addTodo(){
+    const text = input.value.trim();
+    if (!text) return;
+    const todos = loadTodos();
+    todos.push({ text, subject: subjSelect.value, done:false });
+    saveTodos(todos);
+    input.value = '';
+    renderTodos();
+  }
+  addBtn.addEventListener('click', addTodo);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
+
+  renderTodos();
+
+  // Dark mode
+  const modeBtn = document.getElementById('mode-toggle');
+  function setMode(dark){
+    document.body.classList.toggle('dark', dark);
+    modeBtn.innerHTML = dark ? '☀︎ &nbsp;Mode clair' : '☾ &nbsp;Mode sombre';
+    localStorage.setItem('dark-mode', dark ? '1' : '0');
+  }
+  setMode(localStorage.getItem('dark-mode') === '1');
+  modeBtn.addEventListener('click', () => setMode(!document.body.classList.contains('dark')));
+
+  // Schedule placeholder grid
+  const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
+  const slots = ['8h–9h','9h–10h','10h–11h','11h–12h','13h–14h','14h–15h','15h–16h','16h–17h','17h–18h'];
+  const theadRow = document.querySelector('#schedule-table thead tr');
+  days.forEach(d => {
+    const th = document.createElement('th');
+    th.textContent = d;
+    th.style.cssText = "text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;";
+    theadRow.appendChild(th);
+  });
+
+  const schedule = JSON.parse(localStorage.getItem('schedule') || '{}');
+  const tbody = document.getElementById('schedule-body');
+  slots.forEach((slot, r) => {
+    const tr = document.createElement('tr');
+    const th = document.createElement('td');
+    th.textContent = slot;
+    th.style.cssText = "padding:6px 10px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); border-top:1px dashed var(--paper-dark); white-space:nowrap;";
+    tr.appendChild(th);
+    days.forEach((d, c) => {
+      const td = document.createElement('td');
+      td.style.cssText = "padding:2px; border-top:1px dashed var(--paper-dark); border-left:1px dashed var(--paper-dark);";
+      const cellInput = document.createElement('input');
+      cellInput.type = 'text';
+      cellInput.placeholder = '—';
+      const key = r + '-' + c;
+      cellInput.value = schedule[key] || '';
+      cellInput.style.cssText = "width:100%; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size:12.5px; padding:8px 8px; color:var(--ink); outline:none;";
+      cellInput.addEventListener('input', () => {
+        schedule[key] = cellInput.value;
+        localStorage.setItem('schedule', JSON.stringify(schedule));
+      });
+      cellInput.addEventListener('focus', () => td.style.background = 'var(--paper)');
+      cellInput.addEventListener('blur', () => td.style.background = 'transparent');
+      td.appendChild(cellInput);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+</script>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKkxieDJdCqcLjJ8L2VO8-CbQHkOBrVhM",
+    authDomain: "project-c65cfe46-12a8-493f-b49.firebaseapp.com",
+    projectId: "project-c65cfe46-12a8-493f-b49",
+    storageBucket: "project-c65cfe46-12a8-493f-b49.firebasestorage.app",
+    messagingSenderId: "639187831047",
+    appId: "1:639187831047:web:cca9a7662f920417829da2",
+    measurementId: "G-V1FV996N6X"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+</body>
+</html>
