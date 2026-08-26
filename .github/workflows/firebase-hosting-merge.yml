@@ -5,14 +5,34 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-c65cfe46-12a8-493f-b49
+  # Replace after running scripts/setup-github-deploy.sh in Cloud Shell
+  PROJECT_NUMBER: REPLACE_ME
+
 jobs:
-  build_and_deploy:
+  deploy_live:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+
+      - id: auth
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: project-c65cfe46-12a8-493f-b49
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deployer@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy to live channel
+        env:
+          FIREBASE_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: npx --yes firebase-tools@latest deploy --only hosting --project "${{ env.PROJECT_ID }}" --non-interactive

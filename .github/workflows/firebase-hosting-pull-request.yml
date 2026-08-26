@@ -3,13 +3,57 @@ name: Deploy to Firebase Hosting on PR
 on:
   pull_request:
 
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  PROJECT_ID: project-c65cfe46-12a8-493f-b49
+  PROJECT_NUMBER: REPLACE_ME
+
 jobs:
-  build_and_preview:
+  deploy_preview:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+
+      - id: auth
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: project-c65cfe46-12a8-493f-b49
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deployer@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy preview channel
+        id: deploy
+        env:
+          FIREBASE_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: |
+          CHANNEL="pr-${{ github.event.pull_request.number }}"
+          npx --yes firebase-tools@latest hosting:channel:deploy "$CHANNEL" \
+            --only hosting \
+            --project "${{ env.PROJECT_ID }}" \
+            --expires 7d \
+            --non-interactive \
+            --json > deploy.json
+          URL=$(node -e "console.log(JSON.parse(require('fs').readFileSync('deploy.json','utf8')).result[0].url || '')")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.deploy.outputs.url }}';
+            if (!url) return;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Preview: ${url}`
+            });
