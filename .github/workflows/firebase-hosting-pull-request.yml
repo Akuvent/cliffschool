@@ -10,7 +10,7 @@ permissions:
 
 env:
   PROJECT_ID: project-c65cfe46-12a8-493f-b49
-  PROJECT_NUMBER: REPLACE_ME
+  PROJECT_NUMBER: "639187831047"
 
 jobs:
   deploy_preview:
