@@ -45,7 +45,9 @@
   body.dark .today-input select,
   body.dark .chapter summary,
   body.dark .auth-bar,
-  body.dark .auth-bar input{
+  body.dark .auth-bar input,
+  body.dark .auth-card,
+  body.dark .auth-card input{
     background:var(--paper);
   }
 
@@ -66,16 +68,16 @@
     transition:background-color .2s ease, border-color .2s ease, color .2s ease;
   }
 
-  .header-actions{
-    position:absolute;
-    top:52px; right:40px;
-    z-index:3;
+  .global-actions{
+    position:fixed;
+    top:16px; right:24px;
+    z-index:10;
     display:flex;
     flex-wrap:wrap;
     align-items:center;
     justify-content:flex-end;
     gap:8px;
-    max-width:min(100%, 420px);
+    max-width:min(calc(100% - 80px), 420px);
   }
   .mode-toggle,
   .auth-signout{
@@ -138,7 +140,8 @@
     padding:52px 40px 30px 76px;
     z-index:2;
   }
-  header .eyebrow{
+  header .eyebrow,
+  .auth-screen .brand .eyebrow{
     font-family:'IBM Plex Mono', monospace;
     font-size:12.5px;
     letter-spacing:0.14em;
@@ -167,13 +170,55 @@
     line-height:1.5;
   }
 
-  .auth-bar{
-    margin-top:22px;
-    max-width:560px;
+  .auth-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:88px 40px 48px 76px;
+  }
+  .auth-screen[hidden],
+  #app-shell[hidden],
+  .auth-form[hidden],
+  .auth-error[hidden]{
+    display:none !important;
+  }
+  .auth-screen-inner{
+    width:100%;
+    max-width:440px;
+  }
+  .auth-screen .brand{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .auth-screen .brand .eyebrow{ margin-bottom:10px; }
+  .auth-screen .brand h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px, 6vw, 40px);
+    line-height:1.1;
+    color:var(--ink);
+  }
+  .auth-screen .brand h1 em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--red);
+  }
+  .auth-screen .brand p{
+    margin-top:12px;
+    color:var(--ink-soft);
+    font-size:15px;
+    line-height:1.5;
+  }
+  .auth-card{
     background:var(--paper);
     border:1.5px solid var(--line);
-    border-radius:12px;
-    padding:16px 18px;
+    border-radius:14px;
+    padding:22px 20px;
+    box-shadow:0 12px 30px rgba(36,51,80,0.08);
+  }
+  .auth-bar{
+    max-width:560px;
   }
   .auth-heading{
     font-family:'IBM Plex Mono', monospace;
@@ -209,8 +254,13 @@
     color:#fff;
   }
   .auth-form{
-    display:grid;
     gap:10px;
+  }
+  .auth-form.active{
+    display:grid;
+  }
+  .auth-form:not(.active){
+    display:none;
   }
   .auth-form label{
     display:grid;
@@ -257,21 +307,11 @@
     font-family:'IBM Plex Mono', monospace;
     font-size:12.5px;
     color:var(--ink-soft);
+    margin-top:14px;
   }
   .auth-user strong{ color:var(--ink); }
 
-  .sync-login-msg{
-    margin:16px 0;
-    padding:16px 18px;
-    background:var(--paper);
-    border:1.5px dashed var(--line);
-    border-radius:10px;
-    font-size:14px;
-    color:var(--ink-soft);
-    line-height:1.5;
-  }
-  body.authed .sync-login-msg{ display:none; }
-  body:not(.authed) .sync-data{ display:none; }
+  #app-shell{ display:block; }
 
   nav.tabs{
     position:relative;
@@ -526,40 +566,43 @@
 
   @media (max-width:640px){
     header{ padding:40px 18px 24px 54px; }
-    .header-actions{
-      position:static;
-      margin:0 0 16px 0;
+    .global-actions{
+      top:12px; right:12px;
+      left:54px;
       max-width:none;
-      justify-content:flex-start;
+      justify-content:flex-end;
     }
+    body.authed .global-actions{ left:54px; }
+    .auth-screen{ padding:80px 18px 32px 54px; }
     nav.tabs{ padding:0 18px 0 54px; }
     main{ margin:0 18px 0 54px; padding:24px 18px 30px; }
     footer{ padding-left:54px; }
     body::before{ left:10px; width:10px; background-size:10px 60px;}
-    .auth-bar{ max-width:none; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-actions">
-    <span class="sync-status" id="sync-status" aria-live="polite"></span>
-    <button class="mode-toggle" id="mode-toggle" type="button">☾ &nbsp;Mode sombre</button>
-    <button class="auth-signout" id="auth-signout" type="button" hidden>Déconnexion</button>
-  </div>
-  <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
-  <h1>Carnet de <em>Terminale</em></h1>
-  <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
+<div class="global-actions">
+  <span class="sync-status" id="sync-status" aria-live="polite"></span>
+  <button class="mode-toggle" id="mode-toggle" type="button">☾ &nbsp;Mode sombre</button>
+  <button class="auth-signout" id="auth-signout" type="button" hidden>Déconnexion</button>
+</div>
 
-  <div class="auth-bar" id="auth-bar">
-    <p class="auth-heading">Ton compte</p>
-    <div class="auth-forms" id="auth-forms">
+<section id="auth-screen" class="auth-screen" aria-label="Connexion">
+  <div class="auth-screen-inner">
+    <div class="brand">
+      <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
+      <h1>Carnet de <em>Terminale</em></h1>
+      <p>Connecte-toi pour accéder à ton carnet synchronisé.</p>
+    </div>
+    <div class="auth-card">
+      <p class="auth-heading">Ton compte</p>
       <div class="auth-tabs">
         <button type="button" class="auth-tab active" data-auth-tab="login">Se connecter</button>
         <button type="button" class="auth-tab" data-auth-tab="signup">S'inscrire</button>
       </div>
-      <form id="auth-login" class="auth-form">
+      <form id="auth-login" class="auth-form active">
         <label for="login-username">Identifiant
           <input type="text" id="login-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
         </label>
@@ -569,7 +612,7 @@
         <button type="submit">Se connecter</button>
         <p class="auth-error" id="login-error" hidden></p>
       </form>
-      <form id="auth-signup" class="auth-form" hidden>
+      <form id="auth-signup" class="auth-form">
         <label for="signup-username">Identifiant
           <input type="text" id="signup-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
         </label>
@@ -583,10 +626,15 @@
         <p class="auth-error" id="signup-error" hidden></p>
       </form>
     </div>
-    <div class="auth-user" id="auth-user" hidden>
-      Connecté en tant que <strong id="auth-username-display"></strong>
-    </div>
   </div>
+</section>
+
+<div id="app-shell" hidden>
+<header>
+  <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
+  <h1>Carnet de <em>Terminale</em></h1>
+  <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
+  <p class="auth-user" id="auth-user">Connecté en tant que <strong id="auth-username-display"></strong></p>
 </header>
 
 <nav class="tabs">
@@ -608,7 +656,6 @@
   <section class="panel active" id="panel-today">
     <h2>Aujourd'hui</h2>
     <span class="tag" style="background:var(--ink)">Liste du jour</span>
-    <div class="sync-login-msg">Connecte-toi avec ton identifiant pour voir et modifier ta liste du jour — elle se synchronise entre tes appareils.</div>
     <div class="sync-data">
       <div class="today-input">
         <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
@@ -632,7 +679,6 @@
   <section class="panel" id="panel-math">
     <h2>Maths — avance de rentrée</h2>
     <span class="tag" style="background:var(--c-math)">Spécialité</span>
-    <div class="sync-login-msg">Connecte-toi pour cocher les chapitres — ta progression est synchronisée avec ton compte.</div>
     <div class="sync-data">
 
     <details class="chapter" open>
@@ -676,7 +722,6 @@
   <section class="panel" id="panel-nsi">
     <h2>NSI — avance de rentrée</h2>
     <span class="tag" style="background:var(--c-nsi)">Spécialité</span>
-    <div class="sync-login-msg">Connecte-toi pour cocher les chapitres — ta progression est synchronisée avec ton compte.</div>
     <div class="sync-data">
 
     <details class="chapter" open>
@@ -739,7 +784,6 @@
   <section class="panel" id="panel-edt">
     <h2>Emploi du temps</h2>
     <span class="tag" style="background:#5C5F66">À compléter à la rentrée</span>
-    <div class="sync-login-msg">Connecte-toi pour remplir ton emploi du temps — il sera synchronisé avec ton compte.</div>
     <div class="sync-data">
       <div class="note" style="margin-bottom:20px;">Emplacement réservé — tu n'as pas encore ton emploi du temps définitif. Clique dans une case pour noter un cours une fois qu'il te sera donné (ex. « Maths — salle 12 »). Tout est synchronisé avec ton compte.</div>
       <div style="overflow-x:auto;">
@@ -803,6 +847,7 @@
 </main>
 
 <footer>carnet de terminale · fait pour la rentrée</footer>
+</div>
 
 <script>
   // Tab switching
@@ -831,10 +876,13 @@
   const subjSelect = document.getElementById('todo-subject');
   const addBtn = document.getElementById('todo-add');
   const syncStatusEl = document.getElementById('sync-status');
-  const authForms = document.getElementById('auth-forms');
+  const authScreen = document.getElementById('auth-screen');
+  const appShell = document.getElementById('app-shell');
   const authUser = document.getElementById('auth-user');
   const authUsernameDisplay = document.getElementById('auth-username-display');
   const authSignoutBtn = document.getElementById('auth-signout');
+  const authLoginForm = document.getElementById('auth-login');
+  const authSignupForm = document.getElementById('auth-signup');
 
   let appData = { todos: [], checkboxes: {}, schedule: {} };
   let isAuthed = false;
@@ -848,11 +896,22 @@
   function setAuthUI(user, username){
     isAuthed = !!user;
     document.body.classList.toggle('authed', isAuthed);
-    authForms.hidden = isAuthed;
-    authUser.hidden = !isAuthed;
+    authScreen.hidden = isAuthed;
+    appShell.hidden = !isAuthed;
     authSignoutBtn.hidden = !isAuthed;
     authUsernameDisplay.textContent = username || '';
     if (!isAuthed) syncStatusEl.textContent = '';
+  }
+
+  function showAuthPanel(mode){
+    const isLogin = mode === 'login';
+    document.querySelectorAll('.auth-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.authTab === mode);
+    });
+    authLoginForm.classList.toggle('active', isLogin);
+    authSignupForm.classList.toggle('active', !isLogin);
+    document.getElementById('login-error').hidden = true;
+    document.getElementById('signup-error').hidden = true;
   }
 
   function applyCheckboxes(checkboxes){
@@ -1026,16 +1085,9 @@
 
   // Auth UI
   document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const isLogin = tab.dataset.authTab === 'login';
-      document.getElementById('auth-login').hidden = !isLogin;
-      document.getElementById('auth-signup').hidden = isLogin;
-      document.getElementById('login-error').hidden = true;
-      document.getElementById('signup-error').hidden = true;
-    });
+    tab.addEventListener('click', () => showAuthPanel(tab.dataset.authTab));
   });
+  showAuthPanel('login');
 
   function showAuthError(el, msg){
     el.textContent = msg;
