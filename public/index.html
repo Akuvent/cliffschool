@@ -1552,10 +1552,10 @@
             </label>
             <div class="edt-dialog-row">
               <label for="edt-dlg-start">Début
-                <input type="time" id="edt-dlg-start" step="900" min="08:00" max="18:00" required>
+                <input type="time" id="edt-dlg-start" step="60" min="08:00" max="18:00" required>
               </label>
               <label for="edt-dlg-end">Fin
-                <input type="time" id="edt-dlg-end" step="900" min="08:00" max="18:00" required>
+                <input type="time" id="edt-dlg-end" step="60" min="08:00" max="18:00" required>
               </label>
             </div>
             <label for="edt-dlg-title">Nom du cours / tâche
@@ -2175,8 +2175,11 @@
     return Math.max(18, bottom - top);
   }
 
+  // Snap à la minute (pas au quart d’heure) pour coller à la grille à la minute près.
+  const SNAP_STEP_MIN = 1;
+
   function snapMin(min, step){
-    const s = step || 15;
+    const s = step == null ? SNAP_STEP_MIN : step;
     return Math.round(min / s) * s;
   }
 
@@ -2310,7 +2313,7 @@
   function snapTimeInput(input){
     const mins = timeValueToMins(input.value);
     if (mins == null) return;
-    const snapped = clampMin(snapMin(mins, 15));
+    const snapped = clampMin(snapMin(mins));
     input.value = minsToTimeValue(snapped);
   }
 
@@ -2396,8 +2399,8 @@
     if (startMin == null || endMin == null){
       return { error: 'Indique une heure de début et de fin.' };
     }
-    startMin = clampMin(snapMin(startMin, 15));
-    endMin = clampMin(snapMin(endMin, 15));
+    startMin = clampMin(snapMin(startMin));
+    endMin = clampMin(snapMin(endMin));
     if (startMin < DAY_START_MIN || endMin > DAY_END_MIN){
       return { error: 'Les horaires doivent rester entre 8 h et 18 h.' };
     }
@@ -2472,15 +2475,15 @@
   }
 
   function clampDurationWindow(startMin, duration){
-    let s = clampMin(snapMin(startMin, 15));
+    let s = clampMin(snapMin(startMin));
     let e = s + duration;
     if (e > DAY_END_MIN){
       e = DAY_END_MIN;
       s = Math.max(DAY_START_MIN, e - duration);
-      s = snapMin(s, 15);
+      s = snapMin(s);
       e = Math.min(DAY_END_MIN, s + duration);
     }
-    if (e <= s) e = Math.min(DAY_END_MIN, s + 15);
+    if (e <= s) e = Math.min(DAY_END_MIN, s + SNAP_STEP_MIN);
     return { startMin: s, endMin: e };
   }
 
@@ -2589,7 +2592,7 @@
       originX: e.clientX,
       originY: e.clientY,
       moved: false,
-      duration: Math.max(15, block.endMin - block.startMin),
+      duration: Math.max(SNAP_STEP_MIN, block.endMin - block.startMin),
       day: block.day,
       startMin: block.startMin,
       endMin: block.endMin,
@@ -2609,7 +2612,7 @@
     const rect = colEl.getBoundingClientRect();
     const y = clientY - rect.top;
     const raw = DAY_START_MIN + (y / HOUR_PX) * 60;
-    return clampMin(snapMin(raw, 15));
+    return clampMin(snapMin(raw));
   }
 
   function renderSchedule(){
@@ -2752,9 +2755,9 @@
         if (!isAuthed || applyingRemote || isDialogOpen() || edtDrag || edtIgnoreColClick) return;
         if (e.target.closest('.edt-event')) return;
         let startMin = yToMinutes(e.clientY, dayCol);
-        if (startMin >= DAY_END_MIN - 15) startMin = DAY_END_MIN - 60;
+        if (startMin > DAY_END_MIN - 60) startMin = DAY_END_MIN - 60;
         let endMin = Math.min(DAY_END_MIN, startMin + 60);
-        if (endMin <= startMin) endMin = startMin + 15;
+        if (endMin <= startMin) endMin = startMin + SNAP_STEP_MIN;
         openEventDialog({
           mode: 'create',
           day: dayAbs,
