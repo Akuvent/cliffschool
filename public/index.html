@@ -18,6 +18,9 @@
     --line:#C9BFA6;
 
     --c-math:#4C6EF5;
+    --c-maths:#1A3A8F;
+    --c-mathexp:#845EF7;
+    --c-mathcomp:#1971C2;
     --c-nsi:#12B886;
     --c-philo:#8B5CF6;
     --c-phys:#E8590C;
@@ -75,12 +78,21 @@
   body.dark .auth-form select,
   body.dark .auth-form select option,
   body.dark .prefs-form select,
-  body.dark .prefs-form select option{
+  body.dark .prefs-form select option,
+  body.dark .edt-dialog select,
+  body.dark .edt-dialog select option{
     background:#243350;
     color:#fff;
   }
   body.dark .auth-form select,
-  body.dark .prefs-form select{
+  body.dark .prefs-form select,
+  body.dark .edt-dialog select{
+    border-color:var(--line);
+  }
+  body.dark .edt-dialog input[type=text],
+  body.dark .edt-dialog input[type=time]{
+    background:var(--paper-dark);
+    color:var(--ink);
     border-color:var(--line);
   }
 
@@ -113,7 +125,8 @@
     max-width:min(calc(100% - var(--binder-gutter) - 24px), 420px);
   }
   .mode-toggle,
-  .auth-session-btn{
+  .auth-session-btn,
+  .prefs-shortcut{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
     font-weight:600;
@@ -131,7 +144,8 @@
     min-height:44px;
   }
   .mode-toggle:hover,
-  .auth-session-btn:hover{ border-color:var(--ink-soft); }
+  .auth-session-btn:hover,
+  .prefs-shortcut:hover{ border-color:var(--ink-soft); }
   .sync-status{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -463,8 +477,18 @@
     font-size:12.5px;
     color:var(--ink-soft);
     margin-top:14px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 12px;
   }
   .auth-user strong{ color:var(--ink); }
+  .prefs-shortcut{
+    font-size:12px;
+    padding:8px 14px;
+    min-height:44px;
+    white-space:nowrap;
+  }
 
   #app-shell{ display:block; }
 
@@ -500,10 +524,14 @@
     box-shadow: 0 3px 10px rgba(0,0,0,0.12);
   }
   .tab[hidden],
-  .panel[hidden]{
+  .panel[hidden],
+  .res-group[hidden]{
     display:none !important;
   }
   .tab[data-tab="math"]{ background:var(--c-math); }
+  .tab[data-tab="maths"]{ background:var(--c-maths); }
+  .tab[data-tab="mathexp"]{ background:var(--c-mathexp); }
+  .tab[data-tab="mathcomp"]{ background:var(--c-mathcomp); }
   .tab[data-tab="nsi"]{ background:var(--c-nsi); }
   .tab[data-tab="philo"]{ background:var(--c-philo); }
   .tab[data-tab="phys"]{ background:var(--c-phys); }
@@ -521,7 +549,29 @@
     background:var(--btn-primary-bg);
     color:var(--btn-primary-fg);
   }
-  .tab[data-tab="prefs"]{ background:var(--c-prefs); }
+  .tab[data-tab="prefs"]{
+    background:var(--paper);
+    color:var(--ink);
+    border:1.5px solid var(--ink);
+    opacity:0.95;
+    box-shadow:none;
+  }
+  .tab[data-tab="prefs"]:hover{ opacity:1; }
+  .tab[data-tab="prefs"].active{
+    background:var(--c-prefs);
+    color:#fff;
+    border-color:var(--c-prefs);
+  }
+  body.dark .tab[data-tab="prefs"]{
+    background:var(--paper-dark);
+    border-color:var(--ink-soft);
+    color:var(--ink);
+  }
+  body.dark .tab[data-tab="prefs"].active{
+    background:var(--c-prefs);
+    color:#fff;
+    border-color:var(--c-prefs);
+  }
   .tab[data-tab="edt"]{ background:#5C5F66; }
   .tab[data-tab="res"]{ background:var(--c-res); }
 
@@ -858,32 +908,44 @@
     z-index:1;
     box-sizing:border-box;
     margin:0 2px;
-    padding:4px 6px;
+    padding:4px 28px 4px 6px;
     border-radius:4px;
     background:var(--edt-event-bg);
     color:var(--edt-event-fg);
     overflow:hidden;
-    cursor:default;
+    cursor:grab;
     min-height:18px;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
   }
-  .edt-event:focus-within{
+  .edt-event.is-cell{ cursor:default; }
+  .edt-event.is-dragging{
+    z-index:6;
+    cursor:grabbing;
+    touch-action:none;
+    opacity:0.92;
+    box-shadow:0 6px 16px rgba(36,51,80,0.18);
+    pointer-events:none;
+  }
+  .edt-event:focus-visible{
     z-index:2;
     outline:2px solid var(--ink);
     outline-offset:1px;
   }
   .edt-event-title{
-    width:100%;
-    border:none;
-    background:transparent;
+    display:block;
     font-family:'Work Sans', sans-serif;
     font-size:12.5px;
     font-weight:600;
     color:inherit;
-    outline:none;
-    resize:none;
-    field-sizing:content;
-    min-height:1.15em;
     line-height:1.2;
+    word-break:break-word;
+  }
+  .edt-event-title.is-empty{
+    font-weight:500;
+    font-style:italic;
+    opacity:0.75;
   }
   .edt-event-meta{
     margin-top:1px;
@@ -899,6 +961,8 @@
     right:2px;
     width:28px;
     height:28px;
+    min-width:28px;
+    min-height:28px;
     border:none;
     background:transparent;
     color:inherit;
@@ -906,8 +970,151 @@
     cursor:pointer;
     font-size:14px;
     line-height:1;
+    z-index:2;
+    touch-action:manipulation;
   }
   .edt-event-del:hover{ opacity:1; }
+
+  .edt-dialog{
+    padding:16px;
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    box-shadow:none;
+    max-width:100vw;
+    max-height:100vh;
+  }
+  .edt-dialog[open]{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+  }
+  .edt-dialog::backdrop{
+    background:rgba(36,51,80,0.35);
+  }
+  body.dark .edt-dialog::backdrop{
+    background:rgba(0,0,0,0.55);
+  }
+  .edt-dialog-card{
+    width:min(100%, 420px);
+    padding:20px 20px 18px;
+    border-radius:12px;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    box-shadow:0 18px 40px rgba(36,51,80,0.18);
+  }
+  .edt-dialog-card h3{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .edt-dialog-grid{
+    display:grid;
+    gap:12px;
+  }
+  .edt-dialog-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width:400px){
+    .edt-dialog-row{ grid-template-columns:1fr; }
+  }
+  .edt-dialog label,
+  .edt-dialog .edt-dlg-legend{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .edt-dialog input[type=text],
+  .edt-dialog input[type=time],
+  .edt-dialog select{
+    font-family:'Work Sans', sans-serif;
+    font-size:15px;
+    font-weight:500;
+    text-transform:none;
+    letter-spacing:0;
+    color:var(--ink);
+    background:var(--paper);
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    min-height:44px;
+    padding:0 12px;
+    width:100%;
+  }
+  .edt-dialog input:focus,
+  .edt-dialog select:focus{
+    outline:2px solid var(--ink);
+    outline-offset:1px;
+  }
+  .edt-dlg-error{
+    min-height:1.2em;
+    font-family:'Work Sans', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    text-transform:none;
+    letter-spacing:0;
+    color:var(--red);
+  }
+  .edt-swatches{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .edt-swatch{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    border:2px solid transparent;
+    cursor:pointer;
+    padding:0;
+    box-shadow:inset 0 0 0 1px rgba(36,51,80,0.12);
+  }
+  .edt-swatch[aria-checked="true"]{
+    border-color:var(--ink);
+    box-shadow:0 0 0 2px var(--paper), 0 0 0 4px var(--ink);
+  }
+  .edt-dialog-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:16px;
+    justify-content:flex-end;
+  }
+  .edt-dialog-actions button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    min-height:44px;
+    padding:0 16px;
+    border-radius:8px;
+    cursor:pointer;
+    border:1.5px solid var(--paper-dark);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .edt-dialog-actions .edt-dlg-save{
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
+    border-color:transparent;
+  }
+  .edt-dialog-actions .edt-dlg-delete{
+    margin-right:auto;
+    color:var(--red);
+    border-color:var(--red);
+  }
 
   /* Resources panel */
   .res-group{ margin-bottom:28px; }
@@ -927,8 +1134,12 @@
     border-radius:50%;
     display:inline-block;
   }
-  .res-group.math h3::before{ background:var(--c-math); }
-  .res-group.nsi h3::before{ background:var(--c-nsi); }
+  .res-group.math h3::before,
+  .res-group[data-res-spe="math"] h3::before{ background:var(--c-math); }
+  .res-group.nsi h3::before,
+  .res-group[data-res-spe="nsi"] h3::before{ background:var(--c-nsi); }
+  .res-group[data-res-opt="mathexp"] h3::before{ background:var(--c-mathexp); }
+  .res-group[data-res-opt="mathcomp"] h3::before{ background:var(--c-mathcomp); }
   .res-group.other h3::before{ background:var(--ink-soft); }
 
   .res-grid{
@@ -1104,17 +1315,23 @@
   <div class="eyebrow" id="app-eyebrow">Rentrée · Terminale</div>
   <h1>Carnet de <em>Terminale</em></h1>
   <p class="sub" id="app-sub">Ton tableau de bord pour la rentrée : liste du jour, emploi du temps, et le suivi de tes matières.</p>
-  <p class="auth-user" id="auth-user">Connecté en tant que <strong id="auth-username-display"></strong></p>
+  <p class="auth-user" id="auth-user">
+    <span>Connecté en tant que <strong id="auth-username-display"></strong></span>
+    <button type="button" class="prefs-shortcut" id="prefs-shortcut">Préférences</button>
+  </p>
 </header>
 
 <nav class="tabs" aria-label="Matières et sections">
   <button class="tab active" data-tab="today" type="button">Aujourd'hui</button>
   <button class="tab" data-tab="prefs" type="button">Préférences</button>
+  <button class="tab" data-tab="maths" type="button">Maths</button>
   <button class="tab" data-tab="math" type="button" data-kind="specialty" hidden>Spé Maths</button>
   <button class="tab" data-tab="phys" type="button" data-kind="specialty" hidden>Spé Physique-Chimie</button>
   <button class="tab" data-tab="svt" type="button" data-kind="specialty" hidden>Spé SVT</button>
   <button class="tab" data-tab="nsi" type="button" data-kind="specialty" hidden>Spé NSI</button>
   <button class="tab" data-tab="si" type="button" data-kind="specialty" hidden>Spé SI</button>
+  <button class="tab" data-tab="mathexp" type="button" data-kind="option" hidden>Maths expertes</button>
+  <button class="tab" data-tab="mathcomp" type="button" data-kind="option" hidden>Maths complémentaires</button>
   <button class="tab" data-tab="philo" type="button">Philo</button>
   <button class="tab" data-tab="hg" type="button">Histoire-géographie</button>
   <button class="tab" data-tab="eng" type="button">Anglais</button>
@@ -1168,10 +1385,25 @@
           <option value="ita">Italien</option>
         </select>
       </label>
+      <fieldset class="pref-fieldset" id="prefs-options">
+        <legend>Options (hors spécialités)</legend>
+        <p class="pref-hint">Facultatif. Ces choix ne comptent pas dans les 2 ou 3 spécialités.</p>
+        <div class="pref-checks">
+          <label class="pref-check"><input type="checkbox" name="prefs-opt" value="mathexp"> Maths expertes</label>
+          <label class="pref-check"><input type="checkbox" name="prefs-opt" value="mathcomp"> Maths complémentaires</label>
+        </div>
+      </fieldset>
       <button type="submit">Enregistrer</button>
       <p class="prefs-feedback" id="prefs-feedback" aria-live="polite"></p>
-      <div class="note">Tes spécialités et ta LV2 contrôlent les onglets visibles. Les changements sont synchronisés avec ton compte.</div>
+      <div class="note">Tes spécialités, ta LV2 et tes options contrôlent les onglets visibles. Les changements sont synchronisés avec ton compte.</div>
     </form>
+  </section>
+
+  <!-- MATHS TRONC COMMUN -->
+  <section class="panel" id="panel-maths">
+    <h2>Maths</h2>
+    <span class="tag" style="background:var(--c-maths)">Tronc commun</span>
+    <div class="note">Contenu à venir - suivi des maths du tronc commun (distinct de la spécialité Maths).</div>
   </section>
 
   <!-- SPE MATH -->
@@ -1207,6 +1439,20 @@
     <h2>Spé Sciences de l'ingénieur</h2>
     <span class="tag" style="background:var(--c-si)">Spécialité</span>
     <div class="note">Contenu à venir - programme / suivi de Spé SI.</div>
+  </section>
+
+  <!-- OPTION MATHS EXPERTES -->
+  <section class="panel" id="panel-mathexp" hidden>
+    <h2>Maths expertes</h2>
+    <span class="tag" style="background:var(--c-mathexp)">Option</span>
+    <div class="note">Contenu à venir - suivi de l'option Maths expertes. Cette option ne compte pas dans les 2 ou 3 spécialités.</div>
+  </section>
+
+  <!-- OPTION MATHS COMPLÉMENTAIRES -->
+  <section class="panel" id="panel-mathcomp" hidden>
+    <h2>Maths complémentaires</h2>
+    <span class="tag" style="background:var(--c-mathcomp)">Option</span>
+    <div class="note">Contenu à venir - suivi de l'option Maths complémentaires. Cette option ne compte pas dans les 2 ou 3 spécialités.</div>
   </section>
 
   <!-- PHILO -->
@@ -1277,7 +1523,7 @@
     <h2>Emploi du temps</h2>
     <span class="tag" style="background:#5C5F66">Semaine glissante</span>
     <div class="sync-data">
-      <div class="note" style="margin-bottom:16px;">Grille à la minute près (comme Google Calendar) : clique une zone vide pour ajouter un créneau d’1&nbsp;h, ou importe un .ics / .zip. La colonne des heures reste fixe en scroll horizontal.</div>
+      <div class="note" style="margin-bottom:16px;">Grille à la minute près (comme Google Calendar)&nbsp;: tape une zone vide pour créer un créneau, clique un cours pour le modifier, ou glisse pour le déplacer. Tu peux aussi importer un .ics / .zip. La colonne des heures reste fixe en scroll horizontal.</div>
       <div class="edt-toolbar">
         <div class="edt-field">
           <label for="edt-file">Fichier calendrier</label>
@@ -1296,6 +1542,38 @@
       <div class="edt-scroll" id="edt-scroll">
         <div class="edt-cal" id="edt-cal" role="grid" aria-label="Emploi du temps hebdomadaire"></div>
       </div>
+
+      <dialog id="edt-event-dialog" class="edt-dialog" aria-labelledby="edt-dialog-title" aria-modal="true">
+        <div class="edt-dialog-card">
+          <h3 id="edt-dialog-title">Nouveau créneau</h3>
+          <form id="edt-event-form" class="edt-dialog-grid" novalidate>
+            <label for="edt-dlg-day">Jour
+              <select id="edt-dlg-day" required></select>
+            </label>
+            <div class="edt-dialog-row">
+              <label for="edt-dlg-start">Début
+                <input type="time" id="edt-dlg-start" step="900" min="08:00" max="18:00" required>
+              </label>
+              <label for="edt-dlg-end">Fin
+                <input type="time" id="edt-dlg-end" step="900" min="08:00" max="18:00" required>
+              </label>
+            </div>
+            <label for="edt-dlg-title">Nom du cours / tâche
+              <input type="text" id="edt-dlg-title" maxlength="120" required placeholder="ex. Maths — chap. 3" autocomplete="off">
+            </label>
+            <div>
+              <span class="edt-dlg-legend" id="edt-dlg-color-label">Couleur</span>
+              <div class="edt-swatches" id="edt-dlg-colors" role="radiogroup" aria-labelledby="edt-dlg-color-label"></div>
+            </div>
+            <p class="edt-dlg-error" id="edt-dlg-error" role="alert"></p>
+            <div class="edt-dialog-actions">
+              <button type="button" class="edt-dlg-delete" id="edt-dlg-delete" hidden>Supprimer</button>
+              <button type="button" id="edt-dlg-cancel">Annuler</button>
+              <button type="submit" class="edt-dlg-save">Enregistrer</button>
+            </div>
+          </form>
+        </div>
+      </dialog>
     </div>
   </section>
 
@@ -1304,7 +1582,7 @@
     <h2>Ressources conseillées</h2>
     <span class="tag" style="background:var(--c-res)">Sites &amp; chaînes gratuites</span>
 
-    <div class="res-group math">
+    <div class="res-group math" data-res-spe="math">
       <h3>Maths</h3>
       <div class="res-grid">
         <a class="res-card" href="https://www.maths-et-tiques.fr/" target="_blank" rel="noopener">
@@ -1325,7 +1603,7 @@
       </div>
     </div>
 
-    <div class="res-group nsi">
+    <div class="res-group nsi" data-res-spe="nsi">
       <h3>NSI</h3>
       <div class="res-grid">
         <a class="res-card" href="https://www.lesbonsprofs.com/" target="_blank" rel="noopener">
@@ -1352,7 +1630,8 @@
 <script>
   const SPECIALTY_IDS = ['math', 'phys', 'svt', 'nsi', 'si'];
   const LV2_IDS = ['ger', 'esp', 'ita'];
-  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger' };
+  const OPTION_IDS = ['mathexp', 'mathcomp'];
+  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger', options: [] };
 
   const SPECIALTY_SHORT = {
     math: 'Maths',
@@ -1363,6 +1642,7 @@
   };
 
   const TRONC_SUBJECTS = [
+    { id: 'maths', label: 'Maths' },
     { id: 'philo', label: 'Philo' },
     { id: 'hg', label: 'Histoire-géographie' },
     { id: 'eng', label: 'Anglais' },
@@ -1372,14 +1652,16 @@
   ];
 
   const subjColors = {
-    math:'var(--c-math)', nsi:'var(--c-nsi)', philo:'var(--c-philo)',
+    maths:'var(--c-maths)', math:'var(--c-math)', nsi:'var(--c-nsi)', philo:'var(--c-philo)',
     phys:'var(--c-phys)', svt:'var(--c-svt)', si:'var(--c-si)',
+    mathexp:'var(--c-mathexp)', mathcomp:'var(--c-mathcomp)',
     eng:'var(--c-eng)', ger:'var(--c-ger)', esp:'var(--c-esp)', ita:'var(--c-ita)',
     sport:'var(--c-sport)', hg:'var(--c-hg)', sci:'var(--c-sci)', emc:'var(--c-emc)'
   };
   const subjLabels = {
-    math:'Spé Maths', nsi:'Spé NSI', phys:'Spé Physique-Chimie',
+    maths:'Maths', math:'Spé Maths', nsi:'Spé NSI', phys:'Spé Physique-Chimie',
     svt:'Spé SVT', si:'Spé SI',
+    mathexp:'Maths expertes', mathcomp:'Maths complémentaires',
     philo:'Philo', hg:'Histoire-géographie', eng:'Anglais',
     ger:'Allemand', esp:'Espagnol', ita:'Italien',
     sci:'Ens. scientifique', sport:'Sport', emc:'EMC'
@@ -1392,6 +1674,7 @@
   const prefsForm = document.getElementById('prefs-form');
   const prefsFeedback = document.getElementById('prefs-feedback');
   const prefsLv2 = document.getElementById('prefs-lv2');
+  const prefsShortcut = document.getElementById('prefs-shortcut');
 
   function activateTab(tabId){
     const tab = document.querySelector('.tab[data-tab="' + tabId + '"]');
@@ -1410,6 +1693,9 @@
       activateTab(tab.dataset.tab);
     });
   });
+  if (prefsShortcut){
+    prefsShortcut.addEventListener('click', () => activateTab('prefs'));
+  }
 
   const listEl = document.getElementById('todo-list');
   const input = document.getElementById('todo-text');
@@ -1429,7 +1715,11 @@
     todos: [],
     checkboxes: {},
     schedule: {},
-    preferences: { ...DEFAULT_PREFERENCES, specialties: [...DEFAULT_PREFERENCES.specialties] }
+    preferences: {
+      specialties: [...DEFAULT_PREFERENCES.specialties],
+      lv2: DEFAULT_PREFERENCES.lv2,
+      options: [...DEFAULT_PREFERENCES.options]
+    }
   };
   let isAuthed = false;
   let applyingRemote = false;
@@ -1443,6 +1733,7 @@
   function normalizePreferences(raw){
     const allowed = new Set(SPECIALTY_IDS);
     const lv2Allowed = new Set(LV2_IDS);
+    const optionAllowed = new Set(OPTION_IDS);
     let specialties = Array.isArray(raw && raw.specialties)
       ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
       : [];
@@ -1451,13 +1742,22 @@
     }
     let lv2 = raw && raw.lv2;
     if (!lv2Allowed.has(lv2)) lv2 = DEFAULT_PREFERENCES.lv2;
-    return { specialties, lv2 };
+    const options = Array.isArray(raw && raw.options)
+      ? [...new Set(raw.options.filter(s => optionAllowed.has(s)))]
+      : [];
+    return { specialties, lv2, options };
   }
 
   function readSpecialtyChecks(name){
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
       .map(el => el.value)
       .filter(v => SPECIALTY_IDS.includes(v));
+  }
+
+  function readOptionChecks(name){
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+      .map(el => el.value)
+      .filter(v => OPTION_IDS.includes(v));
   }
 
   function validateSpecialtySelection(specialties){
@@ -1490,12 +1790,13 @@
   }
 
   function visibleSubjectIds(prefs){
-    const ids = [
+    return [...new Set([
+      'maths',
       ...prefs.specialties,
       ...TRONC_SUBJECTS.map(s => s.id),
-      prefs.lv2
-    ];
-    return [...new Set(ids)];
+      prefs.lv2,
+      ...(prefs.options || [])
+    ])];
   }
 
   function rebuildTodoSubjects(prefs){
@@ -1516,6 +1817,13 @@
     appData.preferences = normalized;
     const opts = options || {};
 
+    const prefsTab = document.querySelector('.tab[data-tab="prefs"]');
+    if (prefsTab) prefsTab.hidden = false;
+    const mathsTab = document.querySelector('.tab[data-tab="maths"]');
+    const mathsPanel = document.getElementById('panel-maths');
+    if (mathsTab) mathsTab.hidden = false;
+    if (mathsPanel) mathsPanel.hidden = false;
+
     SPECIALTY_IDS.forEach(id => {
       const show = normalized.specialties.includes(id);
       const tab = document.querySelector('.tab[data-tab="' + id + '"]');
@@ -1532,6 +1840,23 @@
       if (panel) panel.hidden = !show;
     });
 
+    OPTION_IDS.forEach(id => {
+      const show = normalized.options.includes(id);
+      const tab = document.querySelector('.tab[data-tab="' + id + '"]');
+      const panel = document.getElementById('panel-' + id);
+      if (tab) tab.hidden = !show;
+      if (panel) panel.hidden = !show;
+    });
+
+    document.querySelectorAll('[data-res-spe]').forEach(group => {
+      const spe = group.getAttribute('data-res-spe');
+      group.hidden = !normalized.specialties.includes(spe);
+    });
+    document.querySelectorAll('[data-res-opt]').forEach(group => {
+      const optId = group.getAttribute('data-res-opt');
+      group.hidden = !normalized.options.includes(optId);
+    });
+
     rebuildTodoSubjects(normalized);
     if (appEyebrow) appEyebrow.textContent = formatEyebrow(normalized);
     if (appSub) appSub.textContent = formatSub(normalized);
@@ -1539,6 +1864,7 @@
     if (!opts.skipForm){
       applyingPrefsUI = true;
       setSpecialtyChecks('prefs-spe', normalized.specialties);
+      setSpecialtyChecks('prefs-opt', normalized.options);
       if (prefsLv2) prefsLv2.value = normalized.lv2;
       applyingPrefsUI = false;
     }
@@ -1693,6 +2019,7 @@
     const specialties = readSpecialtyChecks('prefs-spe');
     const err = validateSpecialtySelection(specialties);
     const lv2 = prefsLv2.value;
+    const optionIds = readOptionChecks('prefs-opt');
     if (err){
       setPrefsFeedback(err, true);
       return false;
@@ -1701,7 +2028,7 @@
       setPrefsFeedback('Choisis une LV2.', true);
       return false;
     }
-    const preferences = { specialties, lv2 };
+    const preferences = { specialties, lv2, options: optionIds };
     applyPreferences(preferences, { skipForm: true });
     window.CarnetSync.saveField('preferences', preferences);
     if (showOk) setPrefsFeedback('Préférences enregistrées.', false);
@@ -1714,6 +2041,12 @@
     savePreferencesFromForm(true);
   });
   prefsForm.querySelectorAll('input[name="prefs-spe"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (applyingPrefsUI) return;
+      savePreferencesFromForm(false);
+    });
+  });
+  prefsForm.querySelectorAll('input[name="prefs-opt"]').forEach(cb => {
     cb.addEventListener('change', () => {
       if (applyingPrefsUI) return;
       savePreferencesFromForm(false);
@@ -1747,8 +2080,36 @@
   const edtFeedback = document.getElementById('edt-feedback');
   const edtFileInput = document.getElementById('edt-file');
   const edtImportBtn = document.getElementById('edt-import-btn');
+  const edtDialog = document.getElementById('edt-event-dialog');
+  const edtForm = document.getElementById('edt-event-form');
+  const edtDlgTitleHeading = document.getElementById('edt-dialog-title');
+  const edtDlgDay = document.getElementById('edt-dlg-day');
+  const edtDlgStart = document.getElementById('edt-dlg-start');
+  const edtDlgEnd = document.getElementById('edt-dlg-end');
+  const edtDlgTitle = document.getElementById('edt-dlg-title');
+  const edtDlgColors = document.getElementById('edt-dlg-colors');
+  const edtDlgError = document.getElementById('edt-dlg-error');
+  const edtDlgCancel = document.getElementById('edt-dlg-cancel');
+  const edtDlgDelete = document.getElementById('edt-dlg-delete');
+  const EDT_COLORS = [
+    { id: 'blue', hex: '#A8C7FA', label: 'Bleu' },
+    { id: 'mint', hex: '#B7E4C7', label: 'Menthe' },
+    { id: 'sand', hex: '#F9E2AF', label: 'Sable' },
+    { id: 'peach', hex: '#FFD8A8', label: 'Pêche' },
+    { id: 'rose', hex: '#F6C1C0', label: 'Rose' },
+    { id: 'lilac', hex: '#D0BFFF', label: 'Lilas' },
+    { id: 'slate', hex: '#C5D0E6', label: 'Ardoise' },
+    { id: 'coral', hex: '#FFC9C9', label: 'Corail' }
+  ];
+  const DRAG_SLOP_PX = 6;
   let scheduleDayOrder = [];
   let midnightTimer = null;
+  let edtDlgMode = 'create'; // create | edit
+  let edtDlgEditId = null;
+  let edtDlgColor = EDT_COLORS[0].hex;
+  let edtDlgRestoreFocus = null;
+  let edtDrag = null;
+  let edtIgnoreColClick = false;
 
   function civilMondayIndex(date){
     const d = (date || new Date()).getDay();
@@ -1878,6 +2239,7 @@
         endMin: clampMin(b.endMin),
         title: ev.title || '',
         location: ev.location || '',
+        color: normalizeEventColor(ev.color),
         kind: 'event'
       });
     });
@@ -1895,12 +2257,352 @@
         endMin,
         title: text,
         location: '',
+        color: null,
         kind: 'cell',
         key
       });
     });
     assignLanes(blocks);
     return blocks;
+  }
+
+  function normalizeEventColor(raw){
+    if (typeof raw !== 'string') return null;
+    const hex = raw.trim();
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return null;
+    return hex.toUpperCase();
+  }
+
+  function contrastOnPastel(hex){
+    // Pastel chips stay light: always use dark ink for readable text in light + dark mode.
+    void hex;
+    return '#1B2A4A';
+  }
+
+  function applyEventChrome(el, color){
+    const c = normalizeEventColor(color);
+    if (c){
+      el.style.background = c;
+      el.style.color = contrastOnPastel(c);
+    } else {
+      el.style.background = '';
+      el.style.color = '';
+    }
+  }
+
+  function minsToTimeValue(mins){
+    const m = clampMin(mins);
+    const h = Math.floor(m / 60);
+    const mm = m % 60;
+    return String(h).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+  }
+
+  function timeValueToMins(val){
+    if (!val || typeof val !== 'string') return null;
+    const parts = val.split(':');
+    if (parts.length < 2) return null;
+    const h = parseInt(parts[0], 10);
+    const mm = parseInt(parts[1], 10);
+    if (!Number.isFinite(h) || !Number.isFinite(mm)) return null;
+    return h * 60 + mm;
+  }
+
+  function snapTimeInput(input){
+    const mins = timeValueToMins(input.value);
+    if (mins == null) return;
+    const snapped = clampMin(snapMin(mins, 15));
+    input.value = minsToTimeValue(snapped);
+  }
+
+  function fillDaySelect(){
+    edtDlgDay.textContent = '';
+    DAYS_ALL.forEach((name, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = name;
+      edtDlgDay.appendChild(opt);
+    });
+  }
+
+  function renderColorSwatches(){
+    edtDlgColors.textContent = '';
+    EDT_COLORS.forEach(c => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'edt-swatch';
+      btn.style.background = c.hex;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-label', c.label);
+      btn.dataset.color = c.hex;
+      btn.addEventListener('click', () => setDlgColor(c.hex));
+      edtDlgColors.appendChild(btn);
+    });
+  }
+
+  function setDlgColor(hex){
+    edtDlgColor = normalizeEventColor(hex) || EDT_COLORS[0].hex;
+    edtDlgColors.querySelectorAll('.edt-swatch').forEach(btn => {
+      btn.setAttribute('aria-checked', btn.dataset.color.toUpperCase() === edtDlgColor ? 'true' : 'false');
+    });
+  }
+
+  function setDlgError(msg){
+    edtDlgError.textContent = msg || '';
+  }
+
+  function isDialogOpen(){
+    return edtDialog.open;
+  }
+
+  function closeEventDialog(){
+    if (edtDialog.open) edtDialog.close();
+    setDlgError('');
+    const restore = edtDlgRestoreFocus;
+    edtDlgRestoreFocus = null;
+    edtDlgEditId = null;
+    if (restore && typeof restore.focus === 'function'){
+      try { restore.focus(); } catch (_) {}
+    }
+  }
+
+  function openEventDialog(opts){
+    if (!isAuthed || applyingRemote) return;
+    edtDlgRestoreFocus = document.activeElement;
+    edtDlgMode = opts.mode === 'edit' ? 'edit' : 'create';
+    edtDlgEditId = opts.id || null;
+    edtDlgTitleHeading.textContent = edtDlgMode === 'edit' ? 'Modifier le créneau' : 'Nouveau créneau';
+    edtDlgDay.value = String(opts.day);
+    edtDlgStart.value = minsToTimeValue(opts.startMin);
+    edtDlgEnd.value = minsToTimeValue(opts.endMin);
+    edtDlgTitle.value = opts.title || '';
+    setDlgColor(opts.color || EDT_COLORS[0].hex);
+    edtDlgDelete.hidden = edtDlgMode !== 'edit';
+    setDlgError('');
+    if (typeof edtDialog.showModal === 'function') edtDialog.showModal();
+    else edtDialog.setAttribute('open', '');
+    setTimeout(() => edtDlgDay.focus(), 0);
+  }
+
+  function readDialogPayload(){
+    snapTimeInput(edtDlgStart);
+    snapTimeInput(edtDlgEnd);
+    const day = parseInt(edtDlgDay.value, 10);
+    let startMin = timeValueToMins(edtDlgStart.value);
+    let endMin = timeValueToMins(edtDlgEnd.value);
+    const title = (edtDlgTitle.value || '').trim();
+    if (!Number.isFinite(day) || day < 0 || day > 6){
+      return { error: 'Choisis un jour valide.' };
+    }
+    if (startMin == null || endMin == null){
+      return { error: 'Indique une heure de début et de fin.' };
+    }
+    startMin = clampMin(snapMin(startMin, 15));
+    endMin = clampMin(snapMin(endMin, 15));
+    if (startMin < DAY_START_MIN || endMin > DAY_END_MIN){
+      return { error: 'Les horaires doivent rester entre 8 h et 18 h.' };
+    }
+    if (endMin <= startMin){
+      return { error: 'La fin doit être après le début.' };
+    }
+    if (!title){
+      return { error: 'Donne un nom au cours ou à la tâche.' };
+    }
+    return {
+      day,
+      startMin,
+      endMin,
+      title,
+      color: edtDlgColor
+    };
+  }
+
+  function saveDialogEvent(e){
+    e.preventDefault();
+    if (!isAuthed || applyingRemote) return;
+    const payload = readDialogPayload();
+    if (payload.error){
+      setDlgError(payload.error);
+      return;
+    }
+    ensureScheduleShape();
+    if (edtDlgMode === 'edit' && edtDlgEditId){
+      const ev = appData.schedule._events.find(x => x.id === edtDlgEditId);
+      if (!ev){
+        setDlgError('Ce créneau n’existe plus.');
+        return;
+      }
+      ev.day = payload.day;
+      ev.startMin = payload.startMin;
+      ev.endMin = payload.endMin;
+      ev.title = payload.title;
+      ev.color = payload.color;
+    } else {
+      appData.schedule._events.push({
+        id: uid(),
+        day: payload.day,
+        startMin: payload.startMin,
+        endMin: payload.endMin,
+        title: payload.title,
+        location: '',
+        color: payload.color,
+        source: 'manual'
+      });
+    }
+    saveSchedule();
+    closeEventDialog();
+    renderSchedule();
+  }
+
+  function deleteDialogEvent(){
+    if (!isAuthed || applyingRemote || !edtDlgEditId) return;
+    ensureScheduleShape();
+    appData.schedule._events = appData.schedule._events.filter(ev => ev.id !== edtDlgEditId);
+    saveSchedule();
+    closeEventDialog();
+    renderSchedule();
+  }
+
+  function dayColFromPoint(clientX, clientY){
+    const stack = document.elementsFromPoint(clientX, clientY);
+    for (let i = 0; i < stack.length; i++){
+      const col = stack[i].closest ? stack[i].closest('.edt-day-col') : null;
+      if (col && edtCal.contains(col)) return col;
+    }
+    return null;
+  }
+
+  function clampDurationWindow(startMin, duration){
+    let s = clampMin(snapMin(startMin, 15));
+    let e = s + duration;
+    if (e > DAY_END_MIN){
+      e = DAY_END_MIN;
+      s = Math.max(DAY_START_MIN, e - duration);
+      s = snapMin(s, 15);
+      e = Math.min(DAY_END_MIN, s + duration);
+    }
+    if (e <= s) e = Math.min(DAY_END_MIN, s + 15);
+    return { startMin: s, endMin: e };
+  }
+
+  function updateDragVisual(clientX, clientY){
+    if (!edtDrag) return;
+    const col = dayColFromPoint(clientX, clientY);
+    if (!col) return;
+    const day = parseInt(col.dataset.day, 10);
+    let startMin = yToMinutes(clientY, col);
+    const next = clampDurationWindow(startMin, edtDrag.duration);
+    edtDrag.day = day;
+    edtDrag.startMin = next.startMin;
+    edtDrag.endMin = next.endMin;
+    if (edtDrag.box.parentElement !== col) col.appendChild(edtDrag.box);
+    edtDrag.box.style.left = '2px';
+    edtDrag.box.style.width = 'calc(100% - 6px)';
+    edtDrag.box.style.top = minToTop(next.startMin) + 'px';
+    edtDrag.box.style.height = rangeToHeight(next.startMin, next.endMin) + 'px';
+    if (edtDrag.meta) edtDrag.meta.textContent = formatRange(next.startMin, next.endMin);
+  }
+
+  function endDrag(clientX, clientY, cancelled){
+    if (!edtDrag) return;
+    const state = edtDrag;
+    edtDrag = null;
+    document.removeEventListener('pointermove', onEdtPointerMove);
+    document.removeEventListener('pointerup', onEdtPointerUp);
+    document.removeEventListener('pointercancel', onEdtPointerCancel);
+    try { state.box.releasePointerCapture(state.pointerId); } catch (_) {}
+    state.box.classList.remove('is-dragging');
+    state.box.style.touchAction = '';
+
+    if (cancelled || !state.moved){
+      if (!cancelled && !state.moved){
+        openEventDialog({
+          mode: 'edit',
+          id: state.id,
+          day: state.origDay,
+          startMin: state.origStart,
+          endMin: state.origEnd,
+          title: state.title,
+          color: state.color
+        });
+      } else {
+        if (state.moved){
+          edtIgnoreColClick = true;
+          setTimeout(() => { edtIgnoreColClick = false; }, 80);
+        }
+        renderSchedule();
+      }
+      return;
+    }
+
+    updateDragVisual(clientX, clientY);
+    if (!isAuthed || applyingRemote){
+      renderSchedule();
+      return;
+    }
+    ensureScheduleShape();
+    const ev = appData.schedule._events.find(e => e.id === state.id);
+    if (ev){
+      ev.day = state.day;
+      ev.startMin = state.startMin;
+      ev.endMin = state.endMin;
+      saveSchedule();
+    }
+    // Évite le click fantôme sur la colonne après un drop (ouvrirait le popup créer).
+    edtIgnoreColClick = true;
+    setTimeout(() => { edtIgnoreColClick = false; }, 80);
+    renderSchedule();
+  }
+
+  function onEdtPointerMove(e){
+    if (!edtDrag || e.pointerId !== edtDrag.pointerId) return;
+    const dx = e.clientX - edtDrag.originX;
+    const dy = e.clientY - edtDrag.originY;
+    if (!edtDrag.moved && (dx * dx + dy * dy) < DRAG_SLOP_PX * DRAG_SLOP_PX) return;
+    if (!edtDrag.moved){
+      edtDrag.moved = true;
+      edtDrag.box.classList.add('is-dragging');
+      edtDrag.box.style.touchAction = 'none';
+    }
+    e.preventDefault();
+    updateDragVisual(e.clientX, e.clientY);
+  }
+
+  function onEdtPointerUp(e){
+    if (!edtDrag || e.pointerId !== edtDrag.pointerId) return;
+    endDrag(e.clientX, e.clientY, false);
+  }
+
+  function onEdtPointerCancel(e){
+    if (!edtDrag || e.pointerId !== edtDrag.pointerId) return;
+    endDrag(e.clientX, e.clientY, true);
+  }
+
+  function startEventDrag(e, block, box, meta){
+    if (e.button != null && e.button !== 0) return;
+    if (!isAuthed || applyingRemote || isDialogOpen() || edtDrag) return;
+    if (e.target.closest('.edt-event-del')) return;
+    edtDrag = {
+      pointerId: e.pointerId,
+      id: block.id,
+      box,
+      meta,
+      originX: e.clientX,
+      originY: e.clientY,
+      moved: false,
+      duration: Math.max(15, block.endMin - block.startMin),
+      day: block.day,
+      startMin: block.startMin,
+      endMin: block.endMin,
+      origDay: block.day,
+      origStart: block.startMin,
+      origEnd: block.endMin,
+      title: block.title,
+      color: block.color
+    };
+    try { box.setPointerCapture(e.pointerId); } catch (_) {}
+    document.addEventListener('pointermove', onEdtPointerMove, { passive: false });
+    document.addEventListener('pointerup', onEdtPointerUp);
+    document.addEventListener('pointercancel', onEdtPointerCancel);
   }
 
   function yToMinutes(clientY, colEl){
@@ -1985,30 +2687,24 @@
         const leftPct = lane * widthPct;
 
         const box = document.createElement('div');
-        box.className = 'edt-event';
+        box.className = 'edt-event' + (block.kind === 'cell' ? ' is-cell' : '');
         box.style.top = top + 'px';
         box.style.height = height + 'px';
         box.style.left = 'calc(' + leftPct + '% + 1px)';
         box.style.width = 'calc(' + widthPct + '% - 4px)';
+        box.dataset.eventId = block.id;
+        applyEventChrome(box, block.color);
+        box.setAttribute('tabindex', block.kind === 'event' ? '0' : '-1');
+        box.setAttribute('role', 'button');
+        box.setAttribute(
+          'aria-label',
+          (block.title || 'Créneau') + ' · ' + DAYS_ALL[dayAbs] + ' · ' + formatRange(block.startMin, block.endMin)
+        );
 
-        const titleInput = document.createElement('textarea');
-        titleInput.className = 'edt-event-title';
-        titleInput.rows = 1;
-        titleInput.value = block.title;
-        titleInput.setAttribute('aria-label', 'Cours ' + DAYS_ALL[dayAbs] + ' ' + formatRange(block.startMin, block.endMin));
-        titleInput.addEventListener('click', e => e.stopPropagation());
-        titleInput.addEventListener('input', () => {
-          if (!isAuthed || applyingRemote) return;
-          if (block.kind === 'event'){
-            const ev = appData.schedule._events.find(e => e.id === block.id);
-            if (ev) ev.title = titleInput.value;
-          } else if (block.key){
-            if (titleInput.value) appData.schedule[block.key] = titleInput.value;
-            else delete appData.schedule[block.key];
-          }
-          saveSchedule();
-        });
-        box.appendChild(titleInput);
+        const titleEl = document.createElement('div');
+        titleEl.className = 'edt-event-title' + (block.title.trim() ? '' : ' is-empty');
+        titleEl.textContent = block.title.trim() ? block.title : 'Sans titre';
+        box.appendChild(titleEl);
 
         const meta = document.createElement('div');
         meta.className = 'edt-event-meta';
@@ -2024,43 +2720,49 @@
           del.textContent = '×';
           del.addEventListener('click', e => {
             e.stopPropagation();
+            e.preventDefault();
             if (!isAuthed || applyingRemote) return;
             appData.schedule._events = appData.schedule._events.filter(ev => ev.id !== block.id);
             saveSchedule();
             renderSchedule();
           });
+          del.addEventListener('pointerdown', e => e.stopPropagation());
           box.appendChild(del);
+
+          box.addEventListener('pointerdown', e => startEventDrag(e, block, box, meta));
+          box.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            openEventDialog({
+              mode: 'edit',
+              id: block.id,
+              day: block.day,
+              startMin: block.startMin,
+              endMin: block.endMin,
+              title: block.title,
+              color: block.color
+            });
+          });
         }
 
         dayCol.appendChild(box);
       });
 
       dayCol.addEventListener('click', e => {
-        if (!isAuthed || applyingRemote) return;
+        if (!isAuthed || applyingRemote || isDialogOpen() || edtDrag || edtIgnoreColClick) return;
         if (e.target.closest('.edt-event')) return;
         let startMin = yToMinutes(e.clientY, dayCol);
         if (startMin >= DAY_END_MIN - 15) startMin = DAY_END_MIN - 60;
         let endMin = Math.min(DAY_END_MIN, startMin + 60);
         if (endMin <= startMin) endMin = startMin + 15;
-        ensureScheduleShape();
-        appData.schedule._events.push({
-          id: uid(),
+        openEventDialog({
+          mode: 'create',
           day: dayAbs,
           startMin,
           endMin,
           title: '',
-          location: '',
-          source: 'manual'
+          color: EDT_COLORS[0].hex
         });
-        saveSchedule();
-        renderSchedule();
-        const freshCol = edtCal.querySelector('.edt-day-col[data-day="' + dayAbs + '"]');
-        if (freshCol){
-          const texts = freshCol.querySelectorAll('.edt-event-title');
-          for (let i = texts.length - 1; i >= 0; i--){
-            if (!texts[i].value){ texts[i].focus(); break; }
-          }
-        }
       });
 
       body.appendChild(dayCol);
@@ -2068,6 +2770,25 @@
 
     edtCal.appendChild(body);
   }
+
+  fillDaySelect();
+  renderColorSwatches();
+  setDlgColor(EDT_COLORS[0].hex);
+
+  edtForm.addEventListener('submit', saveDialogEvent);
+  edtDlgCancel.addEventListener('click', () => closeEventDialog());
+  edtDlgDelete.addEventListener('click', () => deleteDialogEvent());
+  edtDlgStart.addEventListener('blur', () => snapTimeInput(edtDlgStart));
+  edtDlgEnd.addEventListener('blur', () => snapTimeInput(edtDlgEnd));
+  edtDialog.addEventListener('cancel', e => {
+    e.preventDefault();
+    closeEventDialog();
+  });
+  edtDialog.addEventListener('click', e => {
+    // Clic hors de la carte (fond du dialog) = Annuler.
+    if (e.target === edtDialog) closeEventDialog();
+  });
+  edtDialog.querySelector('.edt-dialog-card').addEventListener('click', e => e.stopPropagation());
 
   function applyScheduleToInputs(){
     applyingRemote = true;
@@ -2410,7 +3131,11 @@
           todos: [],
           checkboxes: {},
           schedule: {},
-          preferences: { ...DEFAULT_PREFERENCES, specialties: [...DEFAULT_PREFERENCES.specialties] }
+          preferences: {
+            specialties: [...DEFAULT_PREFERENCES.specialties],
+            lv2: DEFAULT_PREFERENCES.lv2,
+            options: [...DEFAULT_PREFERENCES.options]
+          }
         };
         renderTodos();
         applyCheckboxes({});
@@ -2479,7 +3204,7 @@
   } catch (_) { /* Analytics optionnel */ }
 
   let currentUser = null;
-  let userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: ['math', 'nsi'], lv2: 'ger' } };
+  let userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: ['math', 'nsi'], lv2: 'ger', options: [] } };
   let username = '';
   let unsubSnapshot = null;
   let saveTimers = {};
@@ -2489,7 +3214,8 @@
 
   const SPECIALTY_IDS = ['math', 'phys', 'svt', 'nsi', 'si'];
   const LV2_IDS = ['ger', 'esp', 'ita'];
-  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger' };
+  const OPTION_IDS = ['mathexp', 'mathcomp'];
+  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger', options: [] };
 
   const authCallbacks = [];
   const dataCallbacks = [];
@@ -2498,6 +3224,7 @@
   function normalizePreferences(raw){
     const allowed = new Set(SPECIALTY_IDS);
     const lv2Allowed = new Set(LV2_IDS);
+    const optionAllowed = new Set(OPTION_IDS);
     let specialties = Array.isArray(raw && raw.specialties)
       ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
       : [];
@@ -2506,11 +3233,15 @@
     }
     let lv2 = raw && raw.lv2;
     if (!lv2Allowed.has(lv2)) lv2 = DEFAULT_PREFERENCES.lv2;
-    return { specialties, lv2 };
+    const options = Array.isArray(raw && raw.options)
+      ? [...new Set(raw.options.filter(s => optionAllowed.has(s)))]
+      : [];
+    return { specialties, lv2, options };
   }
 
   function validatePreferencesStrict(raw){
     const allowed = new Set(SPECIALTY_IDS);
+    const optionAllowed = new Set(OPTION_IDS);
     const specialties = Array.isArray(raw && raw.specialties)
       ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
       : [];
@@ -2519,7 +3250,10 @@
     }
     const lv2 = raw && raw.lv2;
     if (!LV2_IDS.includes(lv2)) throw new Error('Choisis une LV2.');
-    return { specialties, lv2 };
+    const options = Array.isArray(raw && raw.options)
+      ? [...new Set(raw.options.filter(s => optionAllowed.has(s)))]
+      : [];
+    return { specialties, lv2, options };
   }
 
   function normalizeUsername(raw){
@@ -2618,13 +3352,13 @@
         todos: [],
         checkboxes: {},
         schedule: {},
-        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 },
+        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2, options: [...DEFAULT_PREFERENCES.options] },
         updatedAt: serverTimestamp()
       });
     } else if (!snap.data().preferences){
       // Comptes existants : défaut Maths + NSI / Allemand (compat UI précédente)
       await updateDoc(ref, {
-        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 },
+        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2, options: [...DEFAULT_PREFERENCES.options] },
         updatedAt: serverTimestamp()
       });
     }
@@ -2656,7 +3390,7 @@
       todos: [],
       checkboxes: {},
       schedule: {},
-      preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 }
+      preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2, options: [...DEFAULT_PREFERENCES.options] }
     };
     username = cloud.username || '';
 
@@ -2839,7 +3573,7 @@
       }
     } else {
       if (unsubSnapshot){ unsubSnapshot(); unsubSnapshot = null; }
-      userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 } };
+      userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2, options: [...DEFAULT_PREFERENCES.options] } };
       username = '';
       migrated = false;
       setStatus('');
