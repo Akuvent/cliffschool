@@ -48,13 +48,17 @@
   }
   body.dark .res-card,
   body.dark .today-input input[type=text],
-  body.dark .today-input select,
   body.dark .chapter summary,
   body.dark .auth-bar,
   body.dark .auth-bar input,
   body.dark .auth-card,
   body.dark .auth-card input{
     background:var(--paper);
+  }
+  body.dark .today-input select,
+  body.dark .today-input select option{
+    background:#243350;
+    color:#fff;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -503,7 +507,12 @@
     min-height:44px;
     border:1.5px solid var(--paper-dark);
     border-radius:8px;
-    background:var(--paper);
+    background:#243350;
+    color:#fff;
+  }
+  .today-input select option{
+    background:#243350;
+    color:#fff;
   }
   .today-input button{
     font-family:'IBM Plex Mono', monospace;
