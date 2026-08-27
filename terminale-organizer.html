@@ -86,7 +86,7 @@
     max-width:min(calc(100% - 80px), 420px);
   }
   .mode-toggle,
-  .auth-signout{
+  .auth-session-btn{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
     font-weight:600;
@@ -104,7 +104,7 @@
     min-height:44px;
   }
   .mode-toggle:hover,
-  .auth-signout:hover{ border-color:var(--ink-soft); }
+  .auth-session-btn:hover{ border-color:var(--ink-soft); }
   .sync-status{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px;
@@ -313,6 +313,25 @@
     color:var(--red);
     line-height:1.4;
   }
+  .auth-ok{
+    font-size:13px;
+    color:var(--c-nsi);
+    line-height:1.4;
+  }
+  .auth-link-btn{
+    font-family:'Work Sans', sans-serif;
+    font-size:13px;
+    background:none;
+    border:none;
+    color:var(--c-math);
+    cursor:pointer;
+    text-align:left;
+    padding:8px 0;
+    min-height:44px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  .auth-link-btn:hover{ color:var(--ink); }
   .auth-user{
     font-family:'IBM Plex Mono', monospace;
     font-size:12.5px;
@@ -596,7 +615,7 @@
 <div class="global-actions">
   <span class="sync-status" id="sync-status" aria-live="polite"></span>
   <button class="mode-toggle" id="mode-toggle" type="button">☾ &nbsp;Mode sombre</button>
-  <button class="auth-signout" id="auth-signout" type="button" hidden>Déconnexion</button>
+  <button class="auth-session-btn" id="auth-session-btn" type="button">Connexion</button>
 </div>
 
 <section id="auth-screen" class="auth-screen" aria-label="Connexion">
@@ -613,18 +632,22 @@
         <button type="button" class="auth-tab" data-auth-tab="signup">S'inscrire</button>
       </div>
       <form id="auth-login" class="auth-form active">
-        <label for="login-username">Identifiant
-          <input type="text" id="login-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
+        <label for="login-email">E-mail
+          <input type="email" id="login-email" autocomplete="email" required>
         </label>
         <label for="login-password">Mot de passe
           <input type="password" id="login-password" autocomplete="current-password" required minlength="6">
         </label>
         <button type="submit">Se connecter</button>
+        <button type="button" class="auth-link-btn" id="goto-reset">Mot de passe oublié ?</button>
         <p class="auth-error" id="login-error" hidden></p>
       </form>
       <form id="auth-signup" class="auth-form">
         <label for="signup-username">Identifiant
           <input type="text" id="signup-username" autocomplete="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]{3,20}">
+        </label>
+        <label for="signup-email">E-mail
+          <input type="email" id="signup-email" autocomplete="email" required>
         </label>
         <label for="signup-password">Mot de passe
           <input type="password" id="signup-password" autocomplete="new-password" required minlength="6">
@@ -634,6 +657,15 @@
         </label>
         <button type="submit">S'inscrire</button>
         <p class="auth-error" id="signup-error" hidden></p>
+      </form>
+      <form id="auth-reset" class="auth-form">
+        <label for="reset-email">E-mail du compte
+          <input type="email" id="reset-email" autocomplete="email" required>
+        </label>
+        <button type="submit">Envoyer le lien de réinitialisation</button>
+        <button type="button" class="auth-link-btn" id="goto-login">Retour à la connexion</button>
+        <p class="auth-error" id="reset-error" hidden></p>
+        <p class="auth-ok" id="reset-ok" hidden></p>
       </form>
     </div>
   </div>
@@ -890,9 +922,10 @@
   const appShell = document.getElementById('app-shell');
   const authUser = document.getElementById('auth-user');
   const authUsernameDisplay = document.getElementById('auth-username-display');
-  const authSignoutBtn = document.getElementById('auth-signout');
+  const authSessionBtn = document.getElementById('auth-session-btn');
   const authLoginForm = document.getElementById('auth-login');
   const authSignupForm = document.getElementById('auth-signup');
+  const authResetForm = document.getElementById('auth-reset');
 
   let appData = { todos: [], checkboxes: {}, schedule: {} };
   let isAuthed = false;
@@ -908,20 +941,22 @@
     document.body.classList.toggle('authed', isAuthed);
     authScreen.hidden = isAuthed;
     appShell.hidden = !isAuthed;
-    authSignoutBtn.hidden = !isAuthed;
+    authSessionBtn.textContent = isAuthed ? 'Déconnexion' : 'Connexion';
     authUsernameDisplay.textContent = username || '';
     if (!isAuthed) syncStatusEl.textContent = '';
   }
 
   function showAuthPanel(mode){
-    const isLogin = mode === 'login';
     document.querySelectorAll('.auth-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.authTab === mode);
     });
-    authLoginForm.classList.toggle('active', isLogin);
-    authSignupForm.classList.toggle('active', !isLogin);
+    authLoginForm.classList.toggle('active', mode === 'login');
+    authSignupForm.classList.toggle('active', mode === 'signup');
+    authResetForm.classList.toggle('active', mode === 'reset');
     document.getElementById('login-error').hidden = true;
     document.getElementById('signup-error').hidden = true;
+    document.getElementById('reset-error').hidden = true;
+    document.getElementById('reset-ok').hidden = true;
   }
 
   function applyCheckboxes(checkboxes){
@@ -1110,7 +1145,7 @@
     showAuthError(errEl, '');
     try {
       await window.CarnetSync.signIn(
-        document.getElementById('login-username').value,
+        document.getElementById('login-email').value,
         document.getElementById('login-password').value
       );
     } catch (err) {
@@ -1131,6 +1166,7 @@
     try {
       await window.CarnetSync.signUp(
         document.getElementById('signup-username').value,
+        document.getElementById('signup-email').value,
         pw
       );
     } catch (err) {
@@ -1138,7 +1174,39 @@
     }
   });
 
-  authSignoutBtn.addEventListener('click', () => window.CarnetSync.signOut());
+  document.getElementById('goto-reset').addEventListener('click', () => {
+    const fromLogin = document.getElementById('login-email').value.trim();
+    if (fromLogin) document.getElementById('reset-email').value = fromLogin;
+    showAuthPanel('reset');
+  });
+  document.getElementById('goto-login').addEventListener('click', () => showAuthPanel('login'));
+
+  document.getElementById('auth-reset').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('reset-error');
+    const okEl = document.getElementById('reset-ok');
+    showAuthError(errEl, '');
+    okEl.hidden = true;
+    try {
+      await window.CarnetSync.resetPassword(document.getElementById('reset-email').value);
+      okEl.textContent = 'Si un compte existe pour cette adresse, un e-mail de réinitialisation a été envoyé. Vérifie ta boîte de réception.';
+      okEl.hidden = false;
+    } catch (err) {
+      showAuthError(errEl, err.message);
+    }
+  });
+
+  authSessionBtn.addEventListener('click', () => {
+    if (isAuthed){
+      window.CarnetSync.signOut();
+      return;
+    }
+    showAuthPanel('login');
+    authScreen.hidden = false;
+    appShell.hidden = true;
+    const email = document.getElementById('login-email');
+    if (email) email.focus();
+  });
 
   whenSyncReady(() => {
     window.CarnetSync.onAuthChange(({ user, username }) => {
@@ -1171,6 +1239,7 @@
     getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    sendPasswordResetEmail,
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
@@ -1185,7 +1254,7 @@
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
   const FIRESTORE_COLLECTION = 'users';
-  const EMAIL_DOMAIN = '@cliffschool.local';
+  const LEGACY_EMAIL_DOMAIN = '@cliffschool.local';
 
   const firebaseConfig = {
     apiKey: "AIzaSyB37EjVM8YCx6oiDcNWPYe-qzjrRNgtHNc",
@@ -1226,18 +1295,23 @@
     return /^[a-zA-Z0-9_-]{3,20}$/.test(raw.trim());
   }
 
-  function toEmail(raw){
-    return normalizeUsername(raw) + EMAIL_DOMAIN;
+  function normalizeEmail(raw){
+    return raw.trim().toLowerCase();
+  }
+
+  function validateEmail(raw){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(raw));
   }
 
   function authErrorMessage(code){
     const map = {
       'auth/wrong-password': 'Mot de passe incorrect.',
-      'auth/invalid-credential': 'Identifiant ou mot de passe incorrect.',
-      'auth/user-not-found': 'Identifiant inconnu.',
-      'auth/email-already-in-use': 'Identifiant déjà pris.',
+      'auth/invalid-credential': 'E-mail ou mot de passe incorrect.',
+      'auth/user-not-found': 'Aucun compte trouvé pour cet e-mail.',
+      'auth/email-already-in-use': 'Cette adresse e-mail est déjà utilisée.',
       'auth/weak-password': 'Mot de passe trop court (6 caractères minimum).',
-      'auth/invalid-email': 'Identifiant invalide.',
+      'auth/invalid-email': 'Adresse e-mail invalide.',
+      'auth/missing-email': 'Indique ton adresse e-mail.',
       'auth/too-many-requests': 'Trop de tentatives — réessaie dans quelques minutes.',
       'auth/network-request-failed': 'Hors ligne — réessaie quand tu es connecté.'
     };
@@ -1298,12 +1372,13 @@
     });
   }
 
-  async function ensureUserDoc(uid, displayUsername){
+  async function ensureUserDoc(uid, displayUsername, email){
     const ref = doc(db, FIRESTORE_COLLECTION, uid);
     const snap = await getDoc(ref);
     if (!snap.exists()){
       await setDoc(ref, {
         username: displayUsername,
+        email: email || '',
         todos: [],
         checkboxes: {},
         schedule: {},
@@ -1395,26 +1470,42 @@
     onAuthChange(fn){ authCallbacks.push(fn); },
     onDataChange(fn){ dataCallbacks.push(fn); },
     onStatusChange(fn){ statusCallbacks.push(fn); fn(syncStatus); },
-    async signIn(rawUsername, password){
-      if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+    async signIn(rawEmail, password){
+      const email = normalizeEmail(rawEmail);
+      if (!validateEmail(email) && !validateUsername(rawEmail)){
+        throw new Error('Adresse e-mail invalide.');
+      }
+      const loginEmail = validateEmail(email) ? email : (normalizeUsername(rawEmail) + LEGACY_EMAIL_DOMAIN);
       try {
-        await signInWithEmailAndPassword(auth, toEmail(rawUsername), password);
+        await signInWithEmailAndPassword(auth, loginEmail, password);
       } catch (err) {
         throw new Error(authErrorMessage(err.code));
       }
     },
-    async signUp(rawUsername, password){
+    async signUp(rawUsername, rawEmail, password){
       if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+      const email = normalizeEmail(rawEmail);
+      if (!validateEmail(email)) throw new Error('Adresse e-mail invalide.');
       if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
       try {
-        const cred = await createUserWithEmailAndPassword(auth, toEmail(rawUsername), password);
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, FIRESTORE_COLLECTION, cred.user.uid), {
           username: rawUsername.trim(),
+          email,
           todos: [],
           checkboxes: {},
           schedule: {},
           updatedAt: serverTimestamp()
         });
+      } catch (err) {
+        throw new Error(authErrorMessage(err.code));
+      }
+    },
+    async resetPassword(rawEmail){
+      const email = normalizeEmail(rawEmail);
+      if (!validateEmail(email)) throw new Error('Adresse e-mail invalide.');
+      try {
+        await sendPasswordResetEmail(auth, email);
       } catch (err) {
         throw new Error(authErrorMessage(err.code));
       }
@@ -1431,7 +1522,8 @@
     currentUser = user;
     if (user){
       try {
-        await ensureUserDoc(user.uid, user.email.split('@')[0]);
+        const fallbackName = user.email ? user.email.split('@')[0] : 'élève';
+        await ensureUserDoc(user.uid, fallbackName, user.email || '');
         await loadAndSubscribe(user.uid);
       } catch (_) {
         setStatus('offline');
