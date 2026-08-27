@@ -632,8 +632,8 @@
         <button type="button" class="auth-tab" data-auth-tab="signup">S'inscrire</button>
       </div>
       <form id="auth-login" class="auth-form active">
-        <label for="login-email">E-mail
-          <input type="email" id="login-email" autocomplete="email" required>
+        <label for="login-id">Identifiant ou e-mail
+          <input type="text" id="login-id" autocomplete="username" required>
         </label>
         <label for="login-password">Mot de passe
           <input type="password" id="login-password" autocomplete="current-password" required minlength="6">
@@ -1145,7 +1145,7 @@
     showAuthError(errEl, '');
     try {
       await window.CarnetSync.signIn(
-        document.getElementById('login-email').value,
+        document.getElementById('login-id').value,
         document.getElementById('login-password').value
       );
     } catch (err) {
@@ -1174,10 +1174,15 @@
     }
   });
 
-  document.getElementById('goto-reset').addEventListener('click', () => {
-    const fromLogin = document.getElementById('login-email').value.trim();
-    if (fromLogin) document.getElementById('reset-email').value = fromLogin;
+  document.getElementById('goto-reset').addEventListener('click', async () => {
+    const fromLogin = document.getElementById('login-id').value.trim();
+    document.getElementById('reset-email').value = '';
     showAuthPanel('reset');
+    if (!fromLogin) return;
+    try {
+      const email = await window.CarnetSync.resolveLoginEmail(fromLogin);
+      if (email) document.getElementById('reset-email').value = email;
+    } catch (_) { /* l'élève pourra saisir l'e-mail manuellement */ }
   });
   document.getElementById('goto-login').addEventListener('click', () => showAuthPanel('login'));
 
@@ -1204,8 +1209,8 @@
     showAuthPanel('login');
     authScreen.hidden = false;
     appShell.hidden = true;
-    const email = document.getElementById('login-email');
-    if (email) email.focus();
+    const loginId = document.getElementById('login-id');
+    if (loginId) loginId.focus();
   });
 
   whenSyncReady(() => {
@@ -1240,6 +1245,7 @@
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
+    deleteUser,
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
@@ -1250,10 +1256,12 @@
     setDoc,
     updateDoc,
     serverTimestamp,
-    onSnapshot
+    onSnapshot,
+    runTransaction
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
   const FIRESTORE_COLLECTION = 'users';
+  const USERNAMES_COLLECTION = 'usernames';
   const LEGACY_EMAIL_DOMAIN = '@cliffschool.local';
 
   const firebaseConfig = {
@@ -1388,6 +1396,22 @@
     return ref;
   }
 
+  async function ensureUsernameMapping(uid, displayUsername, email){
+    if (!email || !displayUsername || !validateUsername(displayUsername)) return;
+    const key = normalizeUsername(displayUsername);
+    const ref = doc(db, USERNAMES_COLLECTION, key);
+    try {
+      const snap = await getDoc(ref);
+      if (!snap.exists()){
+        await setDoc(ref, { email: normalizeEmail(email), uid });
+      } else if (snap.data().uid === uid){
+        const current = normalizeEmail(snap.data().email || '');
+        const next = normalizeEmail(email);
+        if (current !== next) await updateDoc(ref, { email: next });
+      }
+    } catch (_) { /* mapping optionnel pour comptes plus anciens */ }
+  }
+
   async function loadAndSubscribe(uid){
     const ref = doc(db, FIRESTORE_COLLECTION, uid);
     if (unsubSnapshot) unsubSnapshot();
@@ -1417,6 +1441,10 @@
       schedule: cloud.schedule || {}
     };
     notifyData();
+
+    if (currentUser && currentUser.email){
+      await ensureUsernameMapping(uid, username || currentUser.email.split('@')[0], currentUser.email);
+    }
 
     unsubSnapshot = onSnapshot(ref, (docSnap) => {
       if (!docSnap.exists()) return;
@@ -1466,19 +1494,31 @@
     persistField(field, value);
   }
 
+  async function resolveLoginEmail(raw){
+    const trimmed = raw.trim();
+    if (!trimmed) throw new Error('Indique ton identifiant ou ton e-mail.');
+    if (validateEmail(trimmed)) return normalizeEmail(trimmed);
+    if (!validateUsername(trimmed)){
+      throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+    }
+    const key = normalizeUsername(trimmed);
+    const snap = await getDoc(doc(db, USERNAMES_COLLECTION, key));
+    if (snap.exists() && snap.data().email) return normalizeEmail(snap.data().email);
+    // Comptes créés avant le mapping username → e-mail
+    return key + LEGACY_EMAIL_DOMAIN;
+  }
+
   window.CarnetSync = {
     onAuthChange(fn){ authCallbacks.push(fn); },
     onDataChange(fn){ dataCallbacks.push(fn); },
     onStatusChange(fn){ statusCallbacks.push(fn); fn(syncStatus); },
-    async signIn(rawEmail, password){
-      const email = normalizeEmail(rawEmail);
-      if (!validateEmail(email) && !validateUsername(rawEmail)){
-        throw new Error('Adresse e-mail invalide.');
-      }
-      const loginEmail = validateEmail(email) ? email : (normalizeUsername(rawEmail) + LEGACY_EMAIL_DOMAIN);
+    resolveLoginEmail,
+    async signIn(rawLogin, password){
       try {
+        const loginEmail = await resolveLoginEmail(rawLogin);
         await signInWithEmailAndPassword(auth, loginEmail, password);
       } catch (err) {
+        if (err.message && !err.code) throw err;
         throw new Error(authErrorMessage(err.code));
       }
     },
@@ -1487,18 +1527,37 @@
       const email = normalizeEmail(rawEmail);
       if (!validateEmail(email)) throw new Error('Adresse e-mail invalide.');
       if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
+
+      const usernameKey = normalizeUsername(rawUsername);
+      const usernameRef = doc(db, USERNAMES_COLLECTION, usernameKey);
+      const existing = await getDoc(usernameRef);
+      if (existing.exists()) throw new Error('Identifiant déjà pris.');
+
+      let cred;
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, FIRESTORE_COLLECTION, cred.user.uid), {
-          username: rawUsername.trim(),
-          email,
-          todos: [],
-          checkboxes: {},
-          schedule: {},
-          updatedAt: serverTimestamp()
-        });
+        cred = await createUserWithEmailAndPassword(auth, email, password);
       } catch (err) {
         throw new Error(authErrorMessage(err.code));
+      }
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const unameSnap = await tx.get(usernameRef);
+          if (unameSnap.exists()) throw new Error('Identifiant déjà pris.');
+          tx.set(usernameRef, { email, uid: cred.user.uid });
+          tx.set(doc(db, FIRESTORE_COLLECTION, cred.user.uid), {
+            username: rawUsername.trim(),
+            email,
+            todos: [],
+            checkboxes: {},
+            schedule: {},
+            updatedAt: serverTimestamp()
+          });
+        });
+      } catch (err) {
+        try { await deleteUser(cred.user); } catch (_) {}
+        if (err.message === 'Identifiant déjà pris.') throw err;
+        throw new Error(authErrorMessage(err.code) || 'Impossible de créer le compte — réessaie.');
       }
     },
     async resetPassword(rawEmail){
