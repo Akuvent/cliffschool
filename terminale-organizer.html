@@ -21,13 +21,28 @@
     --c-nsi:#12B886;
     --c-philo:#8B5CF6;
     --c-phys:#E8590C;
+    --c-svt:#087F5B;
+    --c-si:#364FC7;
     --c-sport:#F08C00;
     --c-eng:#1C7ED6;
     --c-ger:#2F9E44;
+    --c-esp:#E67700;
+    --c-ita:#C2255C;
+    --c-hg:#A0793D;
+    --c-sci:#1098AD;
+    --c-emc:#5C7CFA;
     --c-res:#C1443D;
+    --c-prefs:#5B6785;
 
     --btn-primary-bg:#243350;
     --btn-primary-fg:#fff;
+
+    /* binder gutter — content offset + decorative spine/holes */
+    --binder-gutter:76px;
+    --binder-holes-left:18px;
+    --binder-holes-size:14px;
+    --binder-holes-gap:70px;
+    --binder-spine-width:46px;
   }
 
   body.dark{
@@ -56,9 +71,17 @@
     background:var(--paper);
   }
   body.dark .today-input select,
-  body.dark .today-input select option{
+  body.dark .today-input select option,
+  body.dark .auth-form select,
+  body.dark .auth-form select option,
+  body.dark .prefs-form select,
+  body.dark .prefs-form select option{
     background:#243350;
     color:#fff;
+  }
+  body.dark .auth-form select,
+  body.dark .prefs-form select{
+    border-color:var(--line);
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -87,7 +110,7 @@
     align-items:center;
     justify-content:flex-end;
     gap:8px;
-    max-width:min(calc(100% - 80px), 420px);
+    max-width:min(calc(100% - var(--binder-gutter) - 24px), 420px);
   }
   .mode-toggle,
   .auth-session-btn{
@@ -125,10 +148,10 @@
   body::before{
     content:"";
     position:fixed;
-    top:0; bottom:0; left:18px;
-    width:14px;
-    background-image: radial-gradient(circle, var(--paper-dark) 5px, transparent 5.5px);
-    background-size: 14px 70px;
+    top:0; bottom:0; left:var(--binder-holes-left);
+    width:var(--binder-holes-size);
+    background-image: radial-gradient(circle, var(--paper-dark) calc(var(--binder-holes-size) * 0.36), transparent calc(var(--binder-holes-size) * 0.4));
+    background-size: var(--binder-holes-size) var(--binder-holes-gap);
     background-repeat: repeat-y;
     background-position: 0 40px;
     z-index:1;
@@ -139,7 +162,7 @@
     content:"";
     position:fixed;
     top:0; bottom:0; left:0;
-    width:46px;
+    width:var(--binder-spine-width);
     border-right:1.5px dashed var(--line);
     z-index:0;
     pointer-events:none;
@@ -147,7 +170,7 @@
 
   header{
     position:relative;
-    padding:52px 40px 30px 76px;
+    padding:52px 40px 30px var(--binder-gutter);
     z-index:2;
   }
   header .eyebrow,
@@ -185,7 +208,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:88px 40px 48px 76px;
+    padding:88px 40px 48px var(--binder-gutter);
   }
   .auth-screen[hidden],
   #app-shell[hidden],
@@ -279,7 +302,10 @@
     font-weight:500;
     color:var(--ink-soft);
   }
-  .auth-form input{
+  .auth-form input,
+  .auth-form select,
+  .prefs-form input,
+  .prefs-form select{
     font-family:'Work Sans', sans-serif;
     font-size:14.5px;
     padding:11px 14px;
@@ -288,16 +314,112 @@
     border-radius:8px;
     background:#fffdf8;
     color:var(--ink);
+    width:100%;
   }
-  body.dark .auth-form input{
+  .auth-form select,
+  .prefs-form select{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    cursor:pointer;
+  }
+  body.dark .auth-form input,
+  body.dark .prefs-form input{
     background:var(--paper-dark);
     color:var(--ink);
     border-color:var(--line);
   }
-  .auth-form input:focus{
+  .auth-form input:focus,
+  .auth-form select:focus,
+  .prefs-form input:focus,
+  .prefs-form select:focus{
     outline:2px solid var(--c-math);
     outline-offset:1px;
   }
+  .pref-fieldset{
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    padding:12px 14px;
+    display:grid;
+    gap:4px;
+    margin:0;
+  }
+  .pref-fieldset legend{
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink-soft);
+    padding:0 6px;
+  }
+  .pref-hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+    line-height:1.4;
+  }
+  .pref-checks{
+    display:grid;
+    gap:2px;
+  }
+  .pref-check{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-height:44px;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .auth-form label.pref-check,
+  .prefs-form label.pref-check{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--ink);
+  }
+  .pref-check input{
+    width:20px;
+    height:20px;
+    min-height:20px;
+    padding:0;
+    flex-shrink:0;
+    accent-color:var(--c-math);
+    cursor:pointer;
+  }
+  .prefs-form{
+    display:grid;
+    gap:14px;
+    max-width:420px;
+  }
+  .prefs-form label{
+    display:grid;
+    gap:6px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--ink-soft);
+  }
+  .prefs-form button[type=submit]{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
+    border:none;
+    padding:12px 20px;
+    min-height:44px;
+    border-radius:8px;
+    cursor:pointer;
+    justify-self:start;
+  }
+  .prefs-form button[type=submit]:hover{ opacity:0.92; }
+  .prefs-feedback{
+    font-size:13px;
+    color:var(--c-nsi);
+    line-height:1.4;
+    min-height:1.2em;
+  }
+  .prefs-feedback.is-error{ color:var(--red); }
   .auth-form button[type=submit]{
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
@@ -352,7 +474,7 @@
     display:flex;
     flex-wrap:wrap;
     gap:6px;
-    padding:0 40px 0 76px;
+    padding:0 40px 0 var(--binder-gutter);
     margin-bottom:10px;
   }
   .tab{
@@ -361,6 +483,7 @@
     font-weight:600;
     letter-spacing:0.02em;
     padding:10px 16px 12px;
+    min-height:44px;
     border:none;
     cursor:pointer;
     color:#fff;
@@ -376,24 +499,36 @@
     transform:translateY(0);
     box-shadow: 0 3px 10px rgba(0,0,0,0.12);
   }
+  .tab[hidden],
+  .panel[hidden]{
+    display:none !important;
+  }
   .tab[data-tab="math"]{ background:var(--c-math); }
   .tab[data-tab="nsi"]{ background:var(--c-nsi); }
   .tab[data-tab="philo"]{ background:var(--c-philo); }
   .tab[data-tab="phys"]{ background:var(--c-phys); }
+  .tab[data-tab="svt"]{ background:var(--c-svt); }
+  .tab[data-tab="si"]{ background:var(--c-si); }
   .tab[data-tab="sport"]{ background:var(--c-sport); }
   .tab[data-tab="eng"]{ background:var(--c-eng); }
   .tab[data-tab="ger"]{ background:var(--c-ger); }
+  .tab[data-tab="esp"]{ background:var(--c-esp); }
+  .tab[data-tab="ita"]{ background:var(--c-ita); }
+  .tab[data-tab="hg"]{ background:var(--c-hg); }
+  .tab[data-tab="sci"]{ background:var(--c-sci); }
+  .tab[data-tab="emc"]{ background:var(--c-emc); }
   .tab[data-tab="today"]{
     background:var(--btn-primary-bg);
     color:var(--btn-primary-fg);
   }
+  .tab[data-tab="prefs"]{ background:var(--c-prefs); }
   .tab[data-tab="edt"]{ background:#5C5F66; }
   .tab[data-tab="res"]{ background:var(--c-res); }
 
   main{
     position:relative;
     z-index:2;
-    margin:0 40px 0 76px;
+    margin:0 40px 0 var(--binder-gutter);
     background:#fffdf8;
     border:1.5px solid var(--line);
     border-radius:2px 14px 14px 14px;
@@ -606,23 +741,49 @@
     font-size:11px;
     color:var(--ink-soft);
     margin-top:30px;
-    padding-left:76px;
+    padding-left:var(--binder-gutter);
   }
 
   @media (max-width:640px){
-    header{ padding:40px 18px 24px 54px; }
+    :root{
+      --binder-gutter:24px;
+      --binder-holes-left:6px;
+      --binder-holes-size:7px;
+      --binder-holes-gap:52px;
+      --binder-spine-width:14px;
+    }
+    header{ padding:40px 18px 24px var(--binder-gutter); }
     .global-actions{
       top:12px; right:12px;
-      left:54px;
+      left:var(--binder-gutter);
       max-width:none;
       justify-content:flex-end;
     }
-    body.authed .global-actions{ left:54px; }
-    .auth-screen{ padding:80px 18px 32px 54px; }
-    nav.tabs{ padding:0 18px 0 54px; }
-    main{ margin:0 18px 0 54px; padding:24px 18px 30px; }
-    footer{ padding-left:54px; }
-    body::before{ left:10px; width:10px; background-size:10px 60px;}
+    body.authed .global-actions{ left:var(--binder-gutter); }
+    .auth-screen{ padding:80px 18px 32px var(--binder-gutter); }
+    .auth-screen-inner{ max-width:100%; }
+    nav.tabs{
+      padding:0 18px 0 var(--binder-gutter);
+      flex-wrap:wrap;
+      gap:6px;
+      overflow-x:visible;
+    }
+    .tab{
+      font-size:11.5px;
+      padding:10px 12px;
+    }
+    main{ margin:0 18px 0 var(--binder-gutter); padding:24px 18px 30px; }
+    footer{ padding-left:var(--binder-gutter); }
+    .prefs-form{ max-width:100%; }
+    .panel h2{ font-size:clamp(22px, 6vw, 26px); }
+  }
+  @media (max-width:380px){
+    :root{
+      --binder-gutter:18px;
+      --binder-spine-width:10px;
+    }
+    body::before{ opacity:0; } /* slim spine only — holes add noise at this width */
+    .tab{ font-size:11px; padding:9px 10px; }
   }
 </style>
 </head>
@@ -637,7 +798,7 @@
 <section id="auth-screen" class="auth-screen" aria-label="Connexion">
   <div class="auth-screen-inner">
     <div class="brand">
-      <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
+      <div class="eyebrow">Rentrée · Terminale générale</div>
       <h1>Carnet de <em>Terminale</em></h1>
       <p>Connecte-toi pour accéder à ton carnet synchronisé.</p>
     </div>
@@ -671,6 +832,25 @@
         <label for="signup-password2">Confirmer le mot de passe
           <input type="password" id="signup-password2" autocomplete="new-password" required minlength="6">
         </label>
+        <fieldset class="pref-fieldset" id="signup-specialties">
+          <legend>Spécialités</legend>
+          <p class="pref-hint">Choisis 2 ou 3 spécialités.</p>
+          <div class="pref-checks">
+            <label class="pref-check"><input type="checkbox" name="signup-spe" value="math"> Maths</label>
+            <label class="pref-check"><input type="checkbox" name="signup-spe" value="phys"> Physique-Chimie</label>
+            <label class="pref-check"><input type="checkbox" name="signup-spe" value="svt"> SVT</label>
+            <label class="pref-check"><input type="checkbox" name="signup-spe" value="nsi"> NSI</label>
+            <label class="pref-check"><input type="checkbox" name="signup-spe" value="si"> Sciences de l'ingénieur</label>
+          </div>
+        </fieldset>
+        <label for="signup-lv2">LV2
+          <select id="signup-lv2" required>
+            <option value="" disabled selected>Choisir…</option>
+            <option value="ger">Allemand</option>
+            <option value="esp">Espagnol</option>
+            <option value="ita">Italien</option>
+          </select>
+        </label>
         <button type="submit">S'inscrire</button>
         <p class="auth-error" id="signup-error" hidden></p>
       </form>
@@ -689,23 +869,31 @@
 
 <div id="app-shell" hidden>
 <header>
-  <div class="eyebrow">Rentrée · Terminale · Spé Maths &amp; NSI</div>
+  <div class="eyebrow" id="app-eyebrow">Rentrée · Terminale</div>
   <h1>Carnet de <em>Terminale</em></h1>
-  <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
+  <p class="sub" id="app-sub">Ton tableau de bord pour la rentrée : liste du jour, emploi du temps, et le suivi de tes matières.</p>
   <p class="auth-user" id="auth-user">Connecté en tant que <strong id="auth-username-display"></strong></p>
 </header>
 
-<nav class="tabs">
-  <button class="tab active" data-tab="today">Aujourd'hui</button>
-  <button class="tab" data-tab="math">Maths</button>
-  <button class="tab" data-tab="nsi">NSI</button>
-  <button class="tab" data-tab="philo">Philo</button>
-  <button class="tab" data-tab="phys">Physique-Chimie</button>
-  <button class="tab" data-tab="eng">Anglais</button>
-  <button class="tab" data-tab="ger">Allemand</button>
-  <button class="tab" data-tab="sport">Sport</button>
-  <button class="tab" data-tab="edt">Emploi du temps</button>
-  <button class="tab" data-tab="res">Ressources</button>
+<nav class="tabs" aria-label="Matières et sections">
+  <button class="tab active" data-tab="today" type="button">Aujourd'hui</button>
+  <button class="tab" data-tab="prefs" type="button">Préférences</button>
+  <button class="tab" data-tab="math" type="button" data-kind="specialty" hidden>Spé Maths</button>
+  <button class="tab" data-tab="phys" type="button" data-kind="specialty" hidden>Spé Physique-Chimie</button>
+  <button class="tab" data-tab="svt" type="button" data-kind="specialty" hidden>Spé SVT</button>
+  <button class="tab" data-tab="nsi" type="button" data-kind="specialty" hidden>Spé NSI</button>
+  <button class="tab" data-tab="si" type="button" data-kind="specialty" hidden>Spé SI</button>
+  <button class="tab" data-tab="philo" type="button">Philo</button>
+  <button class="tab" data-tab="hg" type="button">Histoire-géographie</button>
+  <button class="tab" data-tab="eng" type="button">Anglais</button>
+  <button class="tab" data-tab="ger" type="button" data-kind="lv2" hidden>Allemand</button>
+  <button class="tab" data-tab="esp" type="button" data-kind="lv2" hidden>Espagnol</button>
+  <button class="tab" data-tab="ita" type="button" data-kind="lv2" hidden>Italien</button>
+  <button class="tab" data-tab="sci" type="button">Ens. scientifique</button>
+  <button class="tab" data-tab="sport" type="button">Sport</button>
+  <button class="tab" data-tab="emc" type="button">EMC</button>
+  <button class="tab" data-tab="edt" type="button">Emploi du temps</button>
+  <button class="tab" data-tab="res" type="button">Ressources</button>
 </nav>
 
 <main>
@@ -717,15 +905,7 @@
     <div class="sync-data">
       <div class="today-input">
         <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
-        <select id="todo-subject">
-          <option value="math">Maths</option>
-          <option value="nsi">NSI</option>
-          <option value="philo">Philo</option>
-          <option value="phys">Physique-Chimie</option>
-          <option value="eng">Anglais</option>
-          <option value="ger">Allemand</option>
-          <option value="sport">Sport</option>
-        </select>
+        <select id="todo-subject" aria-label="Matière de la tâche"></select>
         <button type="button" id="todo-add">Ajouter</button>
       </div>
       <div id="todo-list"></div>
@@ -733,74 +913,68 @@
     </div>
   </section>
 
-  <!-- MATH -->
-  <section class="panel" id="panel-math">
-    <h2>Maths — avance de rentrée</h2>
-    <span class="tag" style="background:var(--c-math)">Spécialité</span>
-    <div class="sync-data">
-
-    <details class="chapter" open>
-      <summary>Suites numériques</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="m1"><label for="m1">Revoir suites arithmétiques / géométriques</label></div>
-        <div class="todo-line"><input type="checkbox" id="m2"><label for="m2">Limites de suites</label></div>
-        <div class="todo-line"><input type="checkbox" id="m3"><label for="m3">Raisonnement par récurrence</label></div>
-        <div class="todo-line"><input type="checkbox" id="m4"><label for="m4">Exercices d'application</label></div>
-      </div>
-    </details>
-
-    <details class="chapter">
-      <summary>Dérivation (rappels &amp; approfondissement)</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="m5"><label for="m5">Rappels des règles de dérivation</label></div>
-        <div class="todo-line"><input type="checkbox" id="m6"><label for="m6">Étude complète de fonctions</label></div>
-        <div class="todo-line"><input type="checkbox" id="m7"><label for="m7">Convexité</label></div>
-      </div>
-    </details>
-
-    <details class="chapter">
-      <summary>Fonction exponentielle</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="m8"><label for="m8">Propriétés de la fonction exponentielle</label></div>
-        <div class="todo-line"><input type="checkbox" id="m9"><label for="m9">Équations et inéquations</label></div>
-      </div>
-    </details>
-
-    <details class="chapter">
-      <summary>Boîte à outils fonctions</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="m10"><label for="m10">Variations, limites, composition</label></div>
-      </div>
-    </details>
-    <div class="note">Coche au fur et à mesure — l'état est synchronisé avec ton compte sur tous tes appareils.</div>
-    </div>
+  <!-- PREFS -->
+  <section class="panel" id="panel-prefs">
+    <h2>Préférences</h2>
+    <span class="tag tag-ink">Profil scolaire</span>
+    <form id="prefs-form" class="prefs-form">
+      <fieldset class="pref-fieldset" id="prefs-specialties">
+        <legend>Spécialités</legend>
+        <p class="pref-hint">Choisis 2 ou 3 spécialités. Synchronisé entre tes appareils.</p>
+        <div class="pref-checks">
+          <label class="pref-check"><input type="checkbox" name="prefs-spe" value="math"> Maths</label>
+          <label class="pref-check"><input type="checkbox" name="prefs-spe" value="phys"> Physique-Chimie</label>
+          <label class="pref-check"><input type="checkbox" name="prefs-spe" value="svt"> SVT</label>
+          <label class="pref-check"><input type="checkbox" name="prefs-spe" value="nsi"> NSI</label>
+          <label class="pref-check"><input type="checkbox" name="prefs-spe" value="si"> Sciences de l'ingénieur</label>
+        </div>
+      </fieldset>
+      <label for="prefs-lv2">LV2
+        <select id="prefs-lv2" required>
+          <option value="ger">Allemand</option>
+          <option value="esp">Espagnol</option>
+          <option value="ita">Italien</option>
+        </select>
+      </label>
+      <button type="submit">Enregistrer</button>
+      <p class="prefs-feedback" id="prefs-feedback" aria-live="polite"></p>
+      <div class="note">Tes spécialités et ta LV2 contrôlent les onglets visibles. Les changements sont synchronisés avec ton compte.</div>
+    </form>
   </section>
 
-  <!-- NSI -->
-  <section class="panel" id="panel-nsi">
-    <h2>NSI — avance de rentrée</h2>
+  <!-- SPE MATH -->
+  <section class="panel" id="panel-math" hidden>
+    <h2>Spé Maths</h2>
+    <span class="tag" style="background:var(--c-math)">Spécialité</span>
+    <div class="note">Contenu à venir — programme / suivi de Spé Maths.</div>
+  </section>
+
+  <!-- SPE PHYS -->
+  <section class="panel" id="panel-phys" hidden>
+    <h2>Spé Physique-Chimie</h2>
+    <span class="tag" style="background:var(--c-phys)">Spécialité</span>
+    <div class="note">Contenu à venir — programme / suivi de Spé Physique-Chimie.</div>
+  </section>
+
+  <!-- SPE SVT -->
+  <section class="panel" id="panel-svt" hidden>
+    <h2>Spé SVT</h2>
+    <span class="tag" style="background:var(--c-svt)">Spécialité</span>
+    <div class="note">Contenu à venir — programme / suivi de Spé SVT.</div>
+  </section>
+
+  <!-- SPE NSI -->
+  <section class="panel" id="panel-nsi" hidden>
+    <h2>Spé NSI</h2>
     <span class="tag" style="background:var(--c-nsi)">Spécialité</span>
-    <div class="sync-data">
+    <div class="note">Contenu à venir — programme / suivi de Spé NSI.</div>
+  </section>
 
-    <details class="chapter" open>
-      <summary>Récursivité</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="n1"><label for="n1">Comprendre le principe de récursivité</label></div>
-        <div class="todo-line"><input type="checkbox" id="n2"><label for="n2">Écrire des fonctions récursives simples</label></div>
-        <div class="todo-line"><input type="checkbox" id="n3"><label for="n3">Exercices</label></div>
-      </div>
-    </details>
-
-    <details class="chapter">
-      <summary>Structures de données (piles, files)</summary>
-      <div class="body">
-        <div class="todo-line"><input type="checkbox" id="n4"><label for="n4">Piles (LIFO)</label></div>
-        <div class="todo-line"><input type="checkbox" id="n5"><label for="n5">Files (FIFO)</label></div>
-        <div class="todo-line"><input type="checkbox" id="n6"><label for="n6">Exercices</label></div>
-      </div>
-    </details>
-    <div class="note">Ces deux thèmes reviennent tout au long de l'année en NSI — les voir en avance rend tout le reste plus facile.</div>
-    </div>
+  <!-- SPE SI -->
+  <section class="panel" id="panel-si" hidden>
+    <h2>Spé Sciences de l'ingénieur</h2>
+    <span class="tag" style="background:var(--c-si)">Spécialité</span>
+    <div class="note">Contenu à venir — programme / suivi de Spé SI.</div>
   </section>
 
   <!-- PHILO -->
@@ -810,25 +984,46 @@
     <div class="note">Pas de programme figé à l'avance ici — mais tu peux profiter de la semaine pour lire un texte court (Sénèque, Épictète...) sans pression, juste pour prendre goût à la discipline avant la rentrée.</div>
   </section>
 
-  <!-- PHYSIQUE -->
-  <section class="panel" id="panel-phys">
-    <h2>Physique-Chimie</h2>
-    <span class="tag" style="background:var(--c-phys)">Tronc commun</span>
-    <div class="note">Repasser sur les unités, la mécanique de Première et les calculs de concentration peut suffire pour bien démarrer — pas besoin de tout revoir en profondeur.</div>
+  <!-- HG -->
+  <section class="panel" id="panel-hg">
+    <h2>Histoire-géographie</h2>
+    <span class="tag" style="background:var(--c-hg)">Tronc commun</span>
+    <div class="note">Contenu à venir — suivi du programme d'Histoire-géographie.</div>
   </section>
 
   <!-- ENGLISH -->
   <section class="panel" id="panel-eng">
     <h2>Anglais</h2>
-    <span class="tag" style="background:var(--c-eng)">LV1</span>
+    <span class="tag" style="background:var(--c-eng)">LVA</span>
     <div class="note">Un peu tous les jours (podcast, série en VO, vocabulaire) marche mieux qu'une révision groupée. Aucune préparation particulière nécessaire avant la rentrée.</div>
   </section>
 
-  <!-- GERMAN -->
-  <section class="panel" id="panel-ger">
+  <!-- LV2 GERMAN -->
+  <section class="panel" id="panel-ger" hidden>
     <h2>Allemand</h2>
     <span class="tag" style="background:var(--c-ger)">LV2</span>
     <div class="note">Même logique qu'en anglais : régularité plutôt qu'intensité. Une chanson ou une vidéo courte en allemand de temps en temps suffit.</div>
+  </section>
+
+  <!-- LV2 SPANISH -->
+  <section class="panel" id="panel-esp" hidden>
+    <h2>Espagnol</h2>
+    <span class="tag" style="background:var(--c-esp)">LV2</span>
+    <div class="note">Contenu à venir — suivi de ta LV2 Espagnol. La régularité (écoute, vocabulaire) reste le meilleur levier.</div>
+  </section>
+
+  <!-- LV2 ITALIAN -->
+  <section class="panel" id="panel-ita" hidden>
+    <h2>Italien</h2>
+    <span class="tag" style="background:var(--c-ita)">LV2</span>
+    <div class="note">Contenu à venir — suivi de ta LV2 Italien. Un peu d'écoute régulière vaut mieux qu'une session intensive.</div>
+  </section>
+
+  <!-- ENS SCI -->
+  <section class="panel" id="panel-sci">
+    <h2>Enseignement scientifique</h2>
+    <span class="tag" style="background:var(--c-sci)">Tronc commun</span>
+    <div class="note">Contenu à venir — suivi de l'enseignement scientifique.</div>
   </section>
 
   <!-- SPORT -->
@@ -836,6 +1031,13 @@
     <h2>Sport (EPS)</h2>
     <span class="tag" style="background:var(--c-sport)">Tronc commun</span>
     <div class="note">Rien à préparer — profite de cette semaine pour te reposer et arriver en forme à la rentrée !</div>
+  </section>
+
+  <!-- EMC -->
+  <section class="panel" id="panel-emc">
+    <h2>Enseignement moral et civique</h2>
+    <span class="tag" style="background:var(--c-emc)">Tronc commun</span>
+    <div class="note">Contenu à venir — suivi de l'EMC.</div>
   </section>
 
   <!-- SCHEDULE -->
@@ -908,26 +1110,66 @@
 </div>
 
 <script>
-  // Tab switching
-  const tabs = document.querySelectorAll('.tab');
-  const panels = document.querySelectorAll('.panel');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
-    });
-  });
+  const SPECIALTY_IDS = ['math', 'phys', 'svt', 'nsi', 'si'];
+  const LV2_IDS = ['ger', 'esp', 'ita'];
+  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger' };
+
+  const SPECIALTY_SHORT = {
+    math: 'Maths',
+    phys: 'Physique-Chimie',
+    svt: 'SVT',
+    nsi: 'NSI',
+    si: 'SI'
+  };
+
+  const TRONC_SUBJECTS = [
+    { id: 'philo', label: 'Philo' },
+    { id: 'hg', label: 'Histoire-géographie' },
+    { id: 'eng', label: 'Anglais' },
+    { id: 'sci', label: 'Ens. scientifique' },
+    { id: 'sport', label: 'Sport' },
+    { id: 'emc', label: 'EMC' }
+  ];
 
   const subjColors = {
     math:'var(--c-math)', nsi:'var(--c-nsi)', philo:'var(--c-philo)',
-    phys:'var(--c-phys)', eng:'var(--c-eng)', ger:'var(--c-ger)', sport:'var(--c-sport)'
+    phys:'var(--c-phys)', svt:'var(--c-svt)', si:'var(--c-si)',
+    eng:'var(--c-eng)', ger:'var(--c-ger)', esp:'var(--c-esp)', ita:'var(--c-ita)',
+    sport:'var(--c-sport)', hg:'var(--c-hg)', sci:'var(--c-sci)', emc:'var(--c-emc)'
   };
   const subjLabels = {
-    math:'Maths', nsi:'NSI', philo:'Philo', phys:'Physique-Chimie',
-    eng:'Anglais', ger:'Allemand', sport:'Sport'
+    math:'Spé Maths', nsi:'Spé NSI', phys:'Spé Physique-Chimie',
+    svt:'Spé SVT', si:'Spé SI',
+    philo:'Philo', hg:'Histoire-géographie', eng:'Anglais',
+    ger:'Allemand', esp:'Espagnol', ita:'Italien',
+    sci:'Ens. scientifique', sport:'Sport', emc:'EMC'
   };
+
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const appEyebrow = document.getElementById('app-eyebrow');
+  const appSub = document.getElementById('app-sub');
+  const prefsForm = document.getElementById('prefs-form');
+  const prefsFeedback = document.getElementById('prefs-feedback');
+  const prefsLv2 = document.getElementById('prefs-lv2');
+
+  function activateTab(tabId){
+    const tab = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    const panel = document.getElementById('panel-' + tabId);
+    if (!tab || !panel || tab.hidden) return false;
+    tabs.forEach(t => t.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    panel.classList.add('active');
+    return true;
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.hidden) return;
+      activateTab(tab.dataset.tab);
+    });
+  });
 
   const listEl = document.getElementById('todo-list');
   const input = document.getElementById('todo-text');
@@ -943,13 +1185,128 @@
   const authSignupForm = document.getElementById('auth-signup');
   const authResetForm = document.getElementById('auth-reset');
 
-  let appData = { todos: [], checkboxes: {}, schedule: {} };
+  let appData = {
+    todos: [],
+    checkboxes: {},
+    schedule: {},
+    preferences: { ...DEFAULT_PREFERENCES, specialties: [...DEFAULT_PREFERENCES.specialties] }
+  };
   let isAuthed = false;
   let applyingRemote = false;
+  let applyingPrefsUI = false;
 
   function whenSyncReady(fn){
     if (window.CarnetSync) fn();
     else window.addEventListener('carnet-sync-ready', fn, { once: true });
+  }
+
+  function normalizePreferences(raw){
+    const allowed = new Set(SPECIALTY_IDS);
+    const lv2Allowed = new Set(LV2_IDS);
+    let specialties = Array.isArray(raw && raw.specialties)
+      ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
+      : [];
+    if (specialties.length < 2 || specialties.length > 3){
+      specialties = [...DEFAULT_PREFERENCES.specialties];
+    }
+    let lv2 = raw && raw.lv2;
+    if (!lv2Allowed.has(lv2)) lv2 = DEFAULT_PREFERENCES.lv2;
+    return { specialties, lv2 };
+  }
+
+  function readSpecialtyChecks(name){
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+      .map(el => el.value)
+      .filter(v => SPECIALTY_IDS.includes(v));
+  }
+
+  function validateSpecialtySelection(specialties){
+    if (specialties.length < 2 || specialties.length > 3){
+      return 'Choisis exactement 2 ou 3 spécialités.';
+    }
+    return '';
+  }
+
+  function setSpecialtyChecks(name, specialties){
+    document.querySelectorAll('input[name="' + name + '"]').forEach(cb => {
+      cb.checked = specialties.includes(cb.value);
+    });
+  }
+
+  function formatEyebrow(prefs){
+    const names = prefs.specialties.map(id => SPECIALTY_SHORT[id]).filter(Boolean);
+    if (names.length === 2) return 'Rentrée · Terminale · Spé ' + names[0] + ' & ' + names[1];
+    if (names.length === 3) return 'Rentrée · Terminale · Spé ' + names[0] + ', ' + names[1] + ' & ' + names[2];
+    return 'Rentrée · Terminale';
+  }
+
+  function formatSub(prefs){
+    const names = prefs.specialties.map(id => SPECIALTY_SHORT[id]).filter(Boolean);
+    const speText = names.length
+      ? 'Spé ' + names.join(', ')
+      : 'tes spécialités';
+    const lv2Label = subjLabels[prefs.lv2] || 'ta LV2';
+    return 'Ton tableau de bord pour la rentrée : ' + speText + ', ' + lv2Label + ', tronc commun, liste du jour et ressources.';
+  }
+
+  function visibleSubjectIds(prefs){
+    const ids = [
+      ...prefs.specialties,
+      ...TRONC_SUBJECTS.map(s => s.id),
+      prefs.lv2
+    ];
+    return [...new Set(ids)];
+  }
+
+  function rebuildTodoSubjects(prefs){
+    const prev = subjSelect.value;
+    const ids = visibleSubjectIds(prefs);
+    subjSelect.textContent = '';
+    ids.forEach(id => {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = subjLabels[id] || id;
+      subjSelect.appendChild(opt);
+    });
+    if (ids.includes(prev)) subjSelect.value = prev;
+  }
+
+  function applyPreferences(prefs, options){
+    const normalized = normalizePreferences(prefs);
+    appData.preferences = normalized;
+    const opts = options || {};
+
+    SPECIALTY_IDS.forEach(id => {
+      const show = normalized.specialties.includes(id);
+      const tab = document.querySelector('.tab[data-tab="' + id + '"]');
+      const panel = document.getElementById('panel-' + id);
+      if (tab) tab.hidden = !show;
+      if (panel) panel.hidden = !show;
+    });
+
+    LV2_IDS.forEach(id => {
+      const show = normalized.lv2 === id;
+      const tab = document.querySelector('.tab[data-tab="' + id + '"]');
+      const panel = document.getElementById('panel-' + id);
+      if (tab) tab.hidden = !show;
+      if (panel) panel.hidden = !show;
+    });
+
+    rebuildTodoSubjects(normalized);
+    if (appEyebrow) appEyebrow.textContent = formatEyebrow(normalized);
+    if (appSub) appSub.textContent = formatSub(normalized);
+
+    if (!opts.skipForm){
+      applyingPrefsUI = true;
+      setSpecialtyChecks('prefs-spe', normalized.specialties);
+      if (prefsLv2) prefsLv2.value = normalized.lv2;
+      applyingPrefsUI = false;
+    }
+
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && activeTab.hidden){
+      if (!activateTab('today')) activateTab('prefs');
+    }
   }
 
   function setAuthUI(user, username){
@@ -1040,11 +1397,13 @@
     appData = {
       todos: Array.isArray(data.todos) ? data.todos : [],
       checkboxes: data.checkboxes && typeof data.checkboxes === 'object' ? data.checkboxes : {},
-      schedule: data.schedule && typeof data.schedule === 'object' ? data.schedule : {}
+      schedule: data.schedule && typeof data.schedule === 'object' ? data.schedule : {},
+      preferences: normalizePreferences(data.preferences)
     };
     renderTodos();
     applyCheckboxes(appData.checkboxes);
     applyScheduleToInputs();
+    applyPreferences(appData.preferences);
   }
 
   listEl.addEventListener('click', (e) => {
@@ -1082,6 +1441,47 @@
       appData.checkboxes = collectCheckboxes();
       window.CarnetSync.saveField('checkboxes', appData.checkboxes);
     });
+  });
+
+  function setPrefsFeedback(msg, isError){
+    prefsFeedback.textContent = msg || '';
+    prefsFeedback.classList.toggle('is-error', !!isError);
+  }
+
+  function savePreferencesFromForm(showOk){
+    if (!isAuthed || applyingPrefsUI) return false;
+    const specialties = readSpecialtyChecks('prefs-spe');
+    const err = validateSpecialtySelection(specialties);
+    const lv2 = prefsLv2.value;
+    if (err){
+      setPrefsFeedback(err, true);
+      return false;
+    }
+    if (!LV2_IDS.includes(lv2)){
+      setPrefsFeedback('Choisis une LV2.', true);
+      return false;
+    }
+    const preferences = { specialties, lv2 };
+    applyPreferences(preferences, { skipForm: true });
+    window.CarnetSync.saveField('preferences', preferences);
+    if (showOk) setPrefsFeedback('Préférences enregistrées.', false);
+    else setPrefsFeedback('', false);
+    return true;
+  }
+
+  prefsForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    savePreferencesFromForm(true);
+  });
+  prefsForm.querySelectorAll('input[name="prefs-spe"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (applyingPrefsUI) return;
+      savePreferencesFromForm(false);
+    });
+  });
+  prefsLv2.addEventListener('change', () => {
+    if (applyingPrefsUI) return;
+    savePreferencesFromForm(false);
   });
 
   // Dark mode (local only)
@@ -1179,11 +1579,23 @@
       showAuthError(errEl, 'Les mots de passe ne correspondent pas.');
       return;
     }
+    const specialties = readSpecialtyChecks('signup-spe');
+    const speErr = validateSpecialtySelection(specialties);
+    if (speErr){
+      showAuthError(errEl, speErr);
+      return;
+    }
+    const lv2 = document.getElementById('signup-lv2').value;
+    if (!LV2_IDS.includes(lv2)){
+      showAuthError(errEl, 'Choisis une LV2.');
+      return;
+    }
     try {
       await window.CarnetSync.signUp(
         document.getElementById('signup-username').value,
         document.getElementById('signup-email').value,
-        pw
+        pw,
+        { specialties, lv2 }
       );
     } catch (err) {
       showAuthError(errEl, err.message);
@@ -1229,14 +1641,23 @@
     if (loginId) loginId.focus();
   });
 
+  applyPreferences(DEFAULT_PREFERENCES);
+
   whenSyncReady(() => {
     window.CarnetSync.onAuthChange(({ user, username }) => {
       setAuthUI(user, username);
       if (!user){
-        appData = { todos: [], checkboxes: {}, schedule: {} };
+        appData = {
+          todos: [],
+          checkboxes: {},
+          schedule: {},
+          preferences: { ...DEFAULT_PREFERENCES, specialties: [...DEFAULT_PREFERENCES.specialties] }
+        };
         renderTodos();
         applyCheckboxes({});
         applyScheduleToInputs();
+        applyPreferences(DEFAULT_PREFERENCES);
+        setPrefsFeedback('', false);
       }
     });
 
@@ -1299,7 +1720,7 @@
   } catch (_) { /* Analytics optionnel */ }
 
   let currentUser = null;
-  let userData = { todos: [], checkboxes: {}, schedule: {} };
+  let userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: ['math', 'nsi'], lv2: 'ger' } };
   let username = '';
   let unsubSnapshot = null;
   let saveTimers = {};
@@ -1307,9 +1728,40 @@
   let applyingSnapshot = false;
   let migrated = false;
 
+  const SPECIALTY_IDS = ['math', 'phys', 'svt', 'nsi', 'si'];
+  const LV2_IDS = ['ger', 'esp', 'ita'];
+  const DEFAULT_PREFERENCES = { specialties: ['math', 'nsi'], lv2: 'ger' };
+
   const authCallbacks = [];
   const dataCallbacks = [];
   const statusCallbacks = [];
+
+  function normalizePreferences(raw){
+    const allowed = new Set(SPECIALTY_IDS);
+    const lv2Allowed = new Set(LV2_IDS);
+    let specialties = Array.isArray(raw && raw.specialties)
+      ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
+      : [];
+    if (specialties.length < 2 || specialties.length > 3){
+      specialties = [...DEFAULT_PREFERENCES.specialties];
+    }
+    let lv2 = raw && raw.lv2;
+    if (!lv2Allowed.has(lv2)) lv2 = DEFAULT_PREFERENCES.lv2;
+    return { specialties, lv2 };
+  }
+
+  function validatePreferencesStrict(raw){
+    const allowed = new Set(SPECIALTY_IDS);
+    const specialties = Array.isArray(raw && raw.specialties)
+      ? [...new Set(raw.specialties.filter(s => allowed.has(s)))]
+      : [];
+    if (specialties.length < 2 || specialties.length > 3){
+      throw new Error('Choisis exactement 2 ou 3 spécialités.');
+    }
+    const lv2 = raw && raw.lv2;
+    if (!LV2_IDS.includes(lv2)) throw new Error('Choisis une LV2.');
+    return { specialties, lv2 };
+  }
 
   function normalizeUsername(raw){
     return raw.trim().toLowerCase().replace(/\s/g, '');
@@ -1380,7 +1832,8 @@
     const merged = {
       todos: Array.isArray(cloud.todos) ? [...cloud.todos] : [],
       checkboxes: { ...(local.checkboxes || {}), ...(cloud.checkboxes || {}) },
-      schedule: { ...(local.schedule || {}), ...(cloud.schedule || {}) }
+      schedule: { ...(local.schedule || {}), ...(cloud.schedule || {}) },
+      preferences: normalizePreferences(cloud.preferences)
     };
     if (!merged.todos.length && local.todos && local.todos.length){
       merged.todos = local.todos;
@@ -1406,6 +1859,13 @@
         todos: [],
         checkboxes: {},
         schedule: {},
+        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 },
+        updatedAt: serverTimestamp()
+      });
+    } else if (!snap.data().preferences){
+      // Comptes existants : défaut Maths + NSI / Allemand (compat UI précédente)
+      await updateDoc(ref, {
+        preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 },
         updatedAt: serverTimestamp()
       });
     }
@@ -1433,7 +1893,12 @@
     if (unsubSnapshot) unsubSnapshot();
 
     const snap = await getDoc(ref);
-    let cloud = snap.exists() ? snap.data() : { todos: [], checkboxes: {}, schedule: {} };
+    let cloud = snap.exists() ? snap.data() : {
+      todos: [],
+      checkboxes: {},
+      schedule: {},
+      preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 }
+    };
     username = cloud.username || '';
 
     if (!migrated){
@@ -1454,7 +1919,8 @@
     userData = {
       todos: Array.isArray(cloud.todos) ? cloud.todos : [],
       checkboxes: cloud.checkboxes || {},
-      schedule: cloud.schedule || {}
+      schedule: cloud.schedule || {},
+      preferences: normalizePreferences(cloud.preferences)
     };
     notifyData();
 
@@ -1470,7 +1936,8 @@
       userData = {
         todos: Array.isArray(data.todos) ? data.todos : [],
         checkboxes: data.checkboxes || {},
-        schedule: data.schedule || {}
+        schedule: data.schedule || {},
+        preferences: normalizePreferences(data.preferences)
       };
       notifyData();
       notifyAuth();
@@ -1507,6 +1974,11 @@
       saveTimers.schedule = setTimeout(() => persistField(field, value), 400);
       return;
     }
+    if (field === 'preferences'){
+      clearTimeout(saveTimers.preferences);
+      saveTimers.preferences = setTimeout(() => persistField(field, normalizePreferences(value)), 250);
+      return;
+    }
     persistField(field, value);
   }
 
@@ -1538,11 +2010,12 @@
         throw new Error(authErrorMessage(err.code));
       }
     },
-    async signUp(rawUsername, rawEmail, password){
+    async signUp(rawUsername, rawEmail, password, preferences){
       if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
       const email = normalizeEmail(rawEmail);
       if (!validateEmail(email)) throw new Error('Adresse e-mail invalide.');
       if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
+      const prefs = validatePreferencesStrict(preferences);
 
       const usernameKey = normalizeUsername(rawUsername);
       const usernameRef = doc(db, USERNAMES_COLLECTION, usernameKey);
@@ -1567,12 +2040,14 @@
             todos: [],
             checkboxes: {},
             schedule: {},
+            preferences: prefs,
             updatedAt: serverTimestamp()
           });
         });
       } catch (err) {
         try { await deleteUser(cred.user); } catch (_) {}
         if (err.message === 'Identifiant déjà pris.') throw err;
+        if (err.message && !err.code) throw err;
         throw new Error(authErrorMessage(err.code) || 'Impossible de créer le compte — réessaie.');
       }
     },
@@ -1605,7 +2080,7 @@
       }
     } else {
       if (unsubSnapshot){ unsubSnapshot(); unsubSnapshot = null; }
-      userData = { todos: [], checkboxes: {}, schedule: {} };
+      userData = { todos: [], checkboxes: {}, schedule: {}, preferences: { specialties: [...DEFAULT_PREFERENCES.specialties], lv2: DEFAULT_PREFERENCES.lv2 } };
       username = '';
       migrated = false;
       setStatus('');
