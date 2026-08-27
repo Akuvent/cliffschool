@@ -25,6 +25,9 @@
     --c-eng:#1C7ED6;
     --c-ger:#2F9E44;
     --c-res:#C1443D;
+
+    --btn-primary-bg:#243350;
+    --btn-primary-fg:#fff;
   }
 
   body.dark{
@@ -36,6 +39,9 @@
     --yellow:#F0C93B;
     --grid:#2A314A;
     --line:#3A4260;
+
+    --btn-primary-bg:#EDEBE2;
+    --btn-primary-fg:#1B2030;
   }
   body.dark main{
     background:#161A28;
@@ -249,9 +255,9 @@
     cursor:pointer;
   }
   .auth-tab.active{
-    background:var(--ink);
-    border-color:var(--ink);
-    color:#fff;
+    background:var(--btn-primary-bg);
+    border-color:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
   }
   .auth-form{
     gap:10px;
@@ -279,7 +285,11 @@
     background:#fffdf8;
     color:var(--ink);
   }
-  body.dark .auth-form input{ background:var(--paper-dark); }
+  body.dark .auth-form input{
+    background:var(--paper-dark);
+    color:var(--ink);
+    border-color:var(--line);
+  }
   .auth-form input:focus{
     outline:2px solid var(--c-math);
     outline-offset:1px;
@@ -288,8 +298,8 @@
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
     font-weight:600;
-    background:var(--ink);
-    color:#fff;
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
     border:none;
     padding:12px 20px;
     min-height:44px;
@@ -473,8 +483,8 @@
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
     font-weight:600;
-    background:var(--ink);
-    color:#fff;
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
     border:none;
     padding:0 20px;
     min-height:44px;
