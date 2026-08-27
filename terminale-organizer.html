@@ -37,7 +37,7 @@
     --btn-primary-bg:#243350;
     --btn-primary-fg:#fff;
 
-    /* binder gutter — content offset + decorative spine/holes */
+    /* binder gutter - content offset + decorative spine/holes */
     --binder-gutter:76px;
     --binder-holes-left:18px;
     --binder-holes-size:14px;
@@ -588,7 +588,7 @@
     font-size:18px;
     color:var(--ink-soft);
   }
-  .chapter[open] summary::after{ content:"–"; }
+  .chapter[open] summary::after{ content:"-"; }
   .chapter .body{ padding:6px 18px 16px; }
   .todo-line{
     display:flex;
@@ -758,111 +758,156 @@
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
     max-width:100%;
+    border:1px solid var(--paper-dark);
+    border-radius:10px;
+    background:var(--paper);
   }
-  #schedule-table{
-    border-collapse:collapse;
-    width:100%;
-    min-width:720px;
-    font-size:13px;
+  .edt-cal{
+    --edt-gutter:52px;
+    --edt-hour-h:56px;
+    --edt-day-min:108px;
+    --edt-event-bg:#A8C7FA;
+    --edt-event-fg:#174EA6;
+    min-width:calc(var(--edt-gutter) + 7 * var(--edt-day-min));
   }
-  #schedule-table th,
-  #schedule-table td{
-    vertical-align:top;
+  body.dark .edt-cal{
+    --edt-event-bg:#3C5A8A;
+    --edt-event-fg:#E8F0FE;
   }
-  #schedule-table thead th{
+  .edt-cal-head,
+  .edt-cal-body{
+    display:grid;
+    grid-template-columns:var(--edt-gutter) repeat(7, minmax(var(--edt-day-min), 1fr));
+  }
+  .edt-cal-head{
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:var(--paper);
+    border-bottom:1px solid var(--paper-dark);
+  }
+  .edt-gutter-corner,
+  .edt-gutter{
+    position:sticky;
+    left:0;
+    z-index:4;
+    background:var(--paper);
+    box-shadow:1px 0 0 var(--paper-dark);
+  }
+  .edt-gutter-corner{
+    z-index:5;
+  }
+  .edt-day-head{
+    padding:10px 8px 8px;
     text-align:left;
-    padding:8px 10px;
     font-family:'IBM Plex Mono', monospace;
     font-weight:600;
     color:var(--ink-soft);
     font-size:11px;
     text-transform:uppercase;
+    border-left:1px solid var(--paper-dark);
     white-space:nowrap;
   }
-  #schedule-table thead th .edt-today-mark{
+  .edt-day-head.is-today{
+    color:var(--ink);
+  }
+  .edt-day-head .edt-today-mark{
     display:block;
     margin-top:2px;
     font-size:10px;
     font-weight:500;
     letter-spacing:0.02em;
     text-transform:none;
-    color:var(--ink);
   }
-  #schedule-table .edt-slot-label{
-    padding:6px 10px;
+  .edt-gutter{
+    position:relative;
+    height:calc(10 * var(--edt-hour-h));
+  }
+  .edt-hour-label{
+    position:absolute;
+    right:8px;
+    transform:translateY(-50%);
     font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
+    font-size:11px;
     color:var(--ink-soft);
-    border-top:1px dashed var(--paper-dark);
-    white-space:nowrap;
+    line-height:1;
+    pointer-events:none;
   }
-  #schedule-table .edt-cell{
-    padding:2px;
-    border-top:1px dashed var(--paper-dark);
-    border-left:1px dashed var(--paper-dark);
-    min-width:88px;
+  .edt-day-col{
+    position:relative;
+    height:calc(10 * var(--edt-hour-h));
+    border-left:1px solid var(--paper-dark);
+    cursor:crosshair;
   }
-  #schedule-table .edt-cell.is-focus{
-    background:var(--paper);
+  .edt-day-col.is-today{
+    box-shadow:inset 0 0 0 1px var(--ink-soft);
   }
-  #schedule-table .edt-cell-input{
+  .edt-hour-line{
+    position:absolute;
+    left:0;
+    right:0;
+    border-top:1px solid var(--paper-dark);
+    pointer-events:none;
+  }
+  .edt-hour-line.is-half{
+    border-top-style:dashed;
+    opacity:0.55;
+  }
+  .edt-event{
+    position:absolute;
+    z-index:1;
+    box-sizing:border-box;
+    margin:0 2px;
+    padding:4px 6px;
+    border-radius:4px;
+    background:var(--edt-event-bg);
+    color:var(--edt-event-fg);
+    overflow:hidden;
+    cursor:default;
+    min-height:18px;
+  }
+  .edt-event:focus-within{
+    z-index:2;
+    outline:2px solid var(--ink);
+    outline-offset:1px;
+  }
+  .edt-event-title{
     width:100%;
     border:none;
     background:transparent;
     font-family:'Work Sans', sans-serif;
     font-size:12.5px;
-    padding:8px;
-    color:var(--ink);
-    outline:none;
-  }
-  #schedule-table .edt-lanes{
-    display:flex;
-    gap:4px;
-    align-items:stretch;
-    min-height:100%;
-  }
-  #schedule-table .edt-event{
-    flex:1 1 0;
-    min-width:0;
-    border:1px solid var(--paper-dark);
-    border-radius:6px;
-    background:var(--paper-dark);
-    padding:6px 8px;
-    min-height:44px;
-  }
-  #schedule-table .edt-event-span{
-    height:100%;
-  }
-  #schedule-table .edt-cell-cont .edt-event-cont{
-    min-height:28px;
-    opacity:0.85;
-    border-style:dashed;
-  }
-  #schedule-table td.edt-cell[rowspan] .edt-event{
-    min-height:calc(100% - 4px);
-  }
-  #schedule-table .edt-event-title{
-    width:100%;
-    border:none;
-    background:transparent;
-    font-family:'Work Sans', sans-serif;
-    font-size:12.5px;
-    color:var(--ink);
+    font-weight:600;
+    color:inherit;
     outline:none;
     resize:none;
     field-sizing:content;
-    min-height:1.2em;
+    min-height:1.15em;
+    line-height:1.2;
   }
-  #schedule-table .edt-event-meta{
-    margin-top:2px;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10px;
-    color:var(--ink-soft);
+  .edt-event-meta{
+    margin-top:1px;
+    font-family:'Work Sans', sans-serif;
+    font-size:11px;
+    font-weight:400;
+    line-height:1.25;
+    opacity:0.92;
   }
-  body.dark #schedule-table .edt-event{
-    background:#2A314A;
-    border-color:var(--line);
+  .edt-event-del{
+    position:absolute;
+    top:2px;
+    right:2px;
+    width:28px;
+    height:28px;
+    border:none;
+    background:transparent;
+    color:inherit;
+    opacity:0.55;
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
   }
+  .edt-event-del:hover{ opacity:1; }
 
   /* Resources panel */
   .res-group{ margin-bottom:28px; }
@@ -935,7 +980,7 @@
   }
 
   @media (max-width:640px){
-    /* drop binder decoration on phone — use full width */
+    /* drop binder decoration on phone - use full width */
     :root{
       --binder-gutter:18px;
       --binder-holes-left:0;
@@ -1133,49 +1178,49 @@
   <section class="panel" id="panel-math" hidden>
     <h2>Spé Maths</h2>
     <span class="tag" style="background:var(--c-math)">Spécialité</span>
-    <div class="note">Contenu à venir — programme / suivi de Spé Maths.</div>
+    <div class="note">Contenu à venir - programme / suivi de Spé Maths.</div>
   </section>
 
   <!-- SPE PHYS -->
   <section class="panel" id="panel-phys" hidden>
     <h2>Spé Physique-Chimie</h2>
     <span class="tag" style="background:var(--c-phys)">Spécialité</span>
-    <div class="note">Contenu à venir — programme / suivi de Spé Physique-Chimie.</div>
+    <div class="note">Contenu à venir - programme / suivi de Spé Physique-Chimie.</div>
   </section>
 
   <!-- SPE SVT -->
   <section class="panel" id="panel-svt" hidden>
     <h2>Spé SVT</h2>
     <span class="tag" style="background:var(--c-svt)">Spécialité</span>
-    <div class="note">Contenu à venir — programme / suivi de Spé SVT.</div>
+    <div class="note">Contenu à venir - programme / suivi de Spé SVT.</div>
   </section>
 
   <!-- SPE NSI -->
   <section class="panel" id="panel-nsi" hidden>
     <h2>Spé NSI</h2>
     <span class="tag" style="background:var(--c-nsi)">Spécialité</span>
-    <div class="note">Contenu à venir — programme / suivi de Spé NSI.</div>
+    <div class="note">Contenu à venir - programme / suivi de Spé NSI.</div>
   </section>
 
   <!-- SPE SI -->
   <section class="panel" id="panel-si" hidden>
     <h2>Spé Sciences de l'ingénieur</h2>
     <span class="tag" style="background:var(--c-si)">Spécialité</span>
-    <div class="note">Contenu à venir — programme / suivi de Spé SI.</div>
+    <div class="note">Contenu à venir - programme / suivi de Spé SI.</div>
   </section>
 
   <!-- PHILO -->
   <section class="panel" id="panel-philo">
     <h2>Philosophie</h2>
     <span class="tag" style="background:var(--c-philo)">Tronc commun</span>
-    <div class="note">Pas de programme figé à l'avance ici — mais tu peux profiter de la semaine pour lire un texte court (Sénèque, Épictète...) sans pression, juste pour prendre goût à la discipline avant la rentrée.</div>
+    <div class="note">Pas de programme figé à l'avance ici - mais tu peux profiter de la semaine pour lire un texte court (Sénèque, Épictète...) sans pression, juste pour prendre goût à la discipline avant la rentrée.</div>
   </section>
 
   <!-- HG -->
   <section class="panel" id="panel-hg">
     <h2>Histoire-géographie</h2>
     <span class="tag" style="background:var(--c-hg)">Tronc commun</span>
-    <div class="note">Contenu à venir — suivi du programme d'Histoire-géographie.</div>
+    <div class="note">Contenu à venir - suivi du programme d'Histoire-géographie.</div>
   </section>
 
   <!-- ENGLISH -->
@@ -1196,35 +1241,35 @@
   <section class="panel" id="panel-esp" hidden>
     <h2>Espagnol</h2>
     <span class="tag" style="background:var(--c-esp)">LV2</span>
-    <div class="note">Contenu à venir — suivi de ta LV2 Espagnol. La régularité (écoute, vocabulaire) reste le meilleur levier.</div>
+    <div class="note">Contenu à venir - suivi de ta LV2 Espagnol. La régularité (écoute, vocabulaire) reste le meilleur levier.</div>
   </section>
 
   <!-- LV2 ITALIAN -->
   <section class="panel" id="panel-ita" hidden>
     <h2>Italien</h2>
     <span class="tag" style="background:var(--c-ita)">LV2</span>
-    <div class="note">Contenu à venir — suivi de ta LV2 Italien. Un peu d'écoute régulière vaut mieux qu'une session intensive.</div>
+    <div class="note">Contenu à venir - suivi de ta LV2 Italien. Un peu d'écoute régulière vaut mieux qu'une session intensive.</div>
   </section>
 
   <!-- ENS SCI -->
   <section class="panel" id="panel-sci">
     <h2>Enseignement scientifique</h2>
     <span class="tag" style="background:var(--c-sci)">Tronc commun</span>
-    <div class="note">Contenu à venir — suivi de l'enseignement scientifique.</div>
+    <div class="note">Contenu à venir - suivi de l'enseignement scientifique.</div>
   </section>
 
   <!-- SPORT -->
   <section class="panel" id="panel-sport">
     <h2>Sport (EPS)</h2>
     <span class="tag" style="background:var(--c-sport)">Tronc commun</span>
-    <div class="note">Rien à préparer — profite de cette semaine pour te reposer et arriver en forme à la rentrée !</div>
+    <div class="note">Rien à préparer - profite de cette semaine pour te reposer et arriver en forme à la rentrée !</div>
   </section>
 
   <!-- EMC -->
   <section class="panel" id="panel-emc">
     <h2>Enseignement moral et civique</h2>
     <span class="tag" style="background:var(--c-emc)">Tronc commun</span>
-    <div class="note">Contenu à venir — suivi de l'EMC.</div>
+    <div class="note">Contenu à venir - suivi de l'EMC.</div>
   </section>
 
   <!-- SCHEDULE -->
@@ -1232,7 +1277,7 @@
     <h2>Emploi du temps</h2>
     <span class="tag" style="background:#5C5F66">Semaine glissante</span>
     <div class="sync-data">
-      <div class="note" style="margin-bottom:16px;">Clique dans une case pour noter un cours ou une session d’étude (ex. « Maths — salle 12 »). Tu peux aussi importer un export Google Calendar (.ics ou .zip). Tout est synchronisé avec ton compte.</div>
+      <div class="note" style="margin-bottom:16px;">Grille à la minute près (comme Google Calendar) : clique une zone vide pour ajouter un créneau d’1&nbsp;h, ou importe un .ics / .zip. La colonne des heures reste fixe en scroll horizontal.</div>
       <div class="edt-toolbar">
         <div class="edt-field">
           <label for="edt-file">Fichier calendrier</label>
@@ -1248,15 +1293,8 @@
         <button type="button" id="edt-import-btn">Importer</button>
       </div>
       <p class="edt-feedback" id="edt-feedback" role="status" aria-live="polite"></p>
-      <div class="edt-scroll">
-        <table id="schedule-table">
-          <thead>
-            <tr>
-              <th scope="col">Créneau</th>
-            </tr>
-          </thead>
-          <tbody id="schedule-body"></tbody>
-        </table>
+      <div class="edt-scroll" id="edt-scroll">
+        <div class="edt-cal" id="edt-cal" role="grid" aria-label="Emploi du temps hebdomadaire"></div>
       </div>
     </div>
   </section>
@@ -1276,7 +1314,7 @@
         </a>
         <a class="res-card" href="https://www.youtube.com/@YMONKA" target="_blank" rel="noopener">
           <div class="name">Yvan Monka (YouTube)</div>
-          <div class="desc">Plus de 1900 vidéos de cours classées par niveau et par chapitre — la référence pour réviser en vidéo.</div>
+          <div class="desc">Plus de 1900 vidéos de cours classées par niveau et par chapitre - la référence pour réviser en vidéo.</div>
           <span class="url">youtube.com/@YMONKA</span>
         </a>
         <a class="res-card" href="https://www.youtube.com/@Mathrix" target="_blank" rel="noopener">
@@ -1303,7 +1341,7 @@
       </div>
     </div>
 
-    <div class="note">Tous ces liens ouvrent un nouvel onglet. Si un site te semble payant ou peu fiable, ferme-le et reviens ici — ces sélections sont toutes gratuites et largement utilisées par des lycéens français.</div>
+    <div class="note">Tous ces liens ouvrent un nouvel onglet. Si un site te semble payant ou peu fiable, ferme-le et reviens ici - ces sélections sont toutes gratuites et largement utilisées par des lycéens français.</div>
   </section>
 
 </main>
@@ -1557,7 +1595,7 @@
     if (todos.length === 0){
       const empty = document.createElement('div');
       empty.className = 'empty';
-      empty.textContent = 'Aucune tâche pour l\'instant — ajoute la première ci-dessus.';
+      empty.textContent = 'Aucune tâche pour l\'instant - ajoute la première ci-dessus.';
       listEl.appendChild(empty);
       return;
     }
@@ -1696,24 +1734,16 @@
   setMode(localStorage.getItem('dark-mode') === '1');
   modeBtn.addEventListener('click', () => setMode(!document.body.classList.contains('dark')));
 
-  // Schedule grid — stratégie import : .ics / .zip côté client (pas d’API Google :
-  // OAuth GIS + Client ID GCP serait viable en pure SPA, mais impose une config
-  // Cloud Console à chaque utilisateur ; l’export Google .ics/.ical.zip suffit en statique).
+  // Schedule grid - vue type Google Calendar (minutes précises + gutter heures sticky).
+  // Import : .ics / .zip côté client (pas d’API Google OAuth).
   const DAYS_ALL = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-  const SLOT_DEFS = [
-    { label: '8h–9h', start: 8, end: 9 },
-    { label: '9h–10h', start: 9, end: 10 },
-    { label: '10h–11h', start: 10, end: 11 },
-    { label: '11h–12h', start: 11, end: 12 },
-    { label: '13h–14h', start: 13, end: 14 },
-    { label: '14h–15h', start: 14, end: 15 },
-    { label: '15h–16h', start: 15, end: 16 },
-    { label: '16h–17h', start: 16, end: 17 },
-    { label: '17h–18h', start: 17, end: 18 }
-  ];
+  // Anciens créneaux table → minutes (compat clés "row-day" et events startSlot/endSlot).
+  const LEGACY_SLOT_START = [8*60, 9*60, 10*60, 11*60, 13*60, 14*60, 15*60, 16*60, 17*60];
+  const DAY_START_MIN = 8 * 60;
+  const DAY_END_MIN = 18 * 60;
+  const HOUR_PX = 56;
   const ICS_BYDAY = { MO: 0, TU: 1, WE: 2, TH: 3, FR: 4, SA: 5, SU: 6 };
-  const theadRow = document.querySelector('#schedule-table thead tr');
-  const tbody = document.getElementById('schedule-body');
+  const edtCal = document.getElementById('edt-cal');
   const edtFeedback = document.getElementById('edt-feedback');
   const edtFileInput = document.getElementById('edt-file');
   const edtImportBtn = document.getElementById('edt-import-btn');
@@ -1759,39 +1789,78 @@
     edtFeedback.classList.toggle('is-ok', kind === 'ok');
   }
 
-  function rangeToSlots(startDate, endDate){
-    let startH = startDate.getHours() + startDate.getMinutes() / 60;
-    let endH = endDate.getHours() + endDate.getMinutes() / 60;
-    if (endH <= startH) endH += 24;
-    let startSlot = -1;
-    let endSlot = -1;
-    for (let i = 0; i < SLOT_DEFS.length; i++){
-      const s = SLOT_DEFS[i];
-      if (startSlot < 0 && startH < s.end && endH > s.start) startSlot = i;
-      if (startH < s.end && endH > s.start) endSlot = i + 1;
+  function clampMin(m){
+    return Math.max(DAY_START_MIN, Math.min(DAY_END_MIN, m));
+  }
+
+  function formatHm(mins){
+    const m = ((Math.round(mins) % (24 * 60)) + 24 * 60) % (24 * 60);
+    const h = Math.floor(m / 60);
+    const mm = m % 60;
+    return h + ':' + String(mm).padStart(2, '0');
+  }
+
+  function formatRange(startMin, endMin){
+    return 'De ' + formatHm(startMin) + ' à ' + formatHm(endMin);
+  }
+
+  function minToTop(min){
+    return ((clampMin(min) - DAY_START_MIN) / 60) * HOUR_PX;
+  }
+
+  function rangeToHeight(startMin, endMin){
+    const top = minToTop(startMin);
+    const bottom = minToTop(endMin);
+    return Math.max(18, bottom - top);
+  }
+
+  function snapMin(min, step){
+    const s = step || 15;
+    return Math.round(min / s) * s;
+  }
+
+  function eventBounds(ev){
+    if (typeof ev.startMin === 'number' && typeof ev.endMin === 'number'){
+      return { startMin: ev.startMin, endMin: ev.endMin };
     }
-    if (startSlot < 0 || endSlot <= startSlot) return null;
-    return { startSlot, endSlot };
+    if (typeof ev.startSlot === 'number' && typeof ev.endSlot === 'number'){
+      const s = LEGACY_SLOT_START[ev.startSlot];
+      const eIdx = Math.min(ev.endSlot, LEGACY_SLOT_START.length) - 1;
+      const eStart = LEGACY_SLOT_START[Math.max(0, eIdx)];
+      const endMin = eStart != null ? eStart + 60 : s + 60;
+      return { startMin: s, endMin: endMin };
+    }
+    return null;
   }
 
   function eventsOverlap(a, b){
-    return a.day === b.day && a.startSlot < b.endSlot && b.startSlot < a.endSlot;
+    const A = eventBounds(a);
+    const B = eventBounds(b);
+    if (!A || !B) return false;
+    return a.day === b.day && A.startMin < B.endMin && B.startMin < A.endMin;
   }
 
   function assignLanes(dayEvents){
-    const sorted = dayEvents.slice().sort((a, b) => a.startSlot - b.startSlot || b.endSlot - a.endSlot);
+    const sorted = dayEvents.slice().sort((a, b) => {
+      const A = eventBounds(a);
+      const B = eventBounds(b);
+      return A.startMin - B.startMin || (B.endMin - B.startMin) - (A.endMin - A.startMin);
+    });
     const laneEnds = [];
     sorted.forEach(ev => {
-      let lane = laneEnds.findIndex(end => end <= ev.startSlot);
+      const b = eventBounds(ev);
+      let lane = laneEnds.findIndex(end => end <= b.startMin);
       if (lane < 0){
         lane = laneEnds.length;
-        laneEnds.push(ev.endSlot);
+        laneEnds.push(b.endMin);
       } else {
-        laneEnds[lane] = ev.endSlot;
+        laneEnds[lane] = b.endMin;
       }
       ev._lane = lane;
     });
-    return laneEnds.length || 1;
+    const laneCount = Math.max(1, laneEnds.length);
+    sorted.forEach(ev => { ev._laneCount = laneCount; });
+    return laneCount;
   }
 
   function collectDayBlocks(dayAbs){
@@ -1799,186 +1868,205 @@
     const blocks = [];
     appData.schedule._events.forEach(ev => {
       if (ev.day !== dayAbs) return;
-      if (typeof ev.startSlot !== 'number' || typeof ev.endSlot !== 'number') return;
-      if (ev.endSlot <= ev.startSlot) return;
+      const b = eventBounds(ev);
+      if (!b || b.endMin <= b.startMin) return;
+      if (b.endMin <= DAY_START_MIN || b.startMin >= DAY_END_MIN) return;
       blocks.push({
         id: ev.id,
         day: ev.day,
-        startSlot: ev.startSlot,
-        endSlot: Math.min(ev.endSlot, SLOT_DEFS.length),
+        startMin: clampMin(b.startMin),
+        endMin: clampMin(b.endMin),
         title: ev.title || '',
         location: ev.location || '',
         kind: 'event'
       });
     });
-    for (let r = 0; r < SLOT_DEFS.length; r++){
+    LEGACY_SLOT_START.forEach((startMin, r) => {
       const key = cellKey(r, dayAbs);
       const text = scheduleCellValue(key);
-      if (!text.trim()) continue;
-      const covered = blocks.some(b => b.kind === 'event' && b.startSlot <= r && r < b.endSlot);
-      if (covered) continue;
+      if (!text.trim()) return;
+      const endMin = startMin + 60;
+      const covered = blocks.some(b => b.kind === 'event' && b.startMin < endMin && startMin < b.endMin);
+      if (covered) return;
       blocks.push({
         id: 'cell:' + key,
         day: dayAbs,
-        startSlot: r,
-        endSlot: r + 1,
+        startMin,
+        endMin,
         title: text,
         location: '',
         kind: 'cell',
         key
       });
-    }
+    });
     assignLanes(blocks);
     return blocks;
   }
 
-  function buildHeader(){
-    while (theadRow.children.length > 1) theadRow.removeChild(theadRow.lastChild);
-    scheduleDayOrder.forEach((dayAbs, col) => {
-      const th = document.createElement('th');
-      th.scope = 'col';
-      th.textContent = DAYS_ALL[dayAbs];
-      if (col === 0){
-        const mark = document.createElement('span');
-        mark.className = 'edt-today-mark';
-        mark.textContent = 'Aujourd’hui';
-        th.appendChild(mark);
-        th.setAttribute('aria-current', 'date');
-      }
-      theadRow.appendChild(th);
-    });
+  function yToMinutes(clientY, colEl){
+    const rect = colEl.getBoundingClientRect();
+    const y = clientY - rect.top;
+    const raw = DAY_START_MIN + (y / HOUR_PX) * 60;
+    return clampMin(snapMin(raw, 15));
   }
 
   function renderSchedule(){
     ensureScheduleShape();
     scheduleDayOrder = rollingDayOrder();
-    buildHeader();
-    tbody.textContent = '';
+    edtCal.style.setProperty('--edt-hour-h', HOUR_PX + 'px');
+    edtCal.textContent = '';
 
-    const byDay = scheduleDayOrder.map(dayAbs => {
-      const blocks = collectDayBlocks(dayAbs);
-      const overlap = blocks.some((a, i) => blocks.some((b, j) => j > i && eventsOverlap(a, b)));
-      const cover = Array.from({ length: SLOT_DEFS.length }, () => []);
-      blocks.forEach(b => {
-        for (let r = b.startSlot; r < b.endSlot; r++) cover[r].push({ block: b, isStart: r === b.startSlot });
-      });
-      const skip = Array(SLOT_DEFS.length).fill(false);
-      if (!overlap){
-        blocks.forEach(b => {
-          for (let r = b.startSlot + 1; r < b.endSlot; r++) skip[r] = true;
-        });
+    const head = document.createElement('div');
+    head.className = 'edt-cal-head';
+    const corner = document.createElement('div');
+    corner.className = 'edt-gutter-corner';
+    corner.setAttribute('aria-hidden', 'true');
+    head.appendChild(corner);
+
+    scheduleDayOrder.forEach((dayAbs, col) => {
+      const h = document.createElement('div');
+      h.className = 'edt-day-head' + (col === 0 ? ' is-today' : '');
+      h.textContent = DAYS_ALL[dayAbs];
+      if (col === 0){
+        const mark = document.createElement('span');
+        mark.className = 'edt-today-mark';
+        mark.textContent = 'Aujourd’hui';
+        h.appendChild(mark);
+        h.setAttribute('aria-current', 'date');
       }
-      return { dayAbs, blocks, overlap, cover, skip };
+      head.appendChild(h);
     });
+    edtCal.appendChild(head);
 
-    SLOT_DEFS.forEach((slot, r) => {
-      const tr = document.createElement('tr');
-      const th = document.createElement('th');
-      th.scope = 'row';
-      th.className = 'edt-slot-label';
-      th.textContent = slot.label;
-      tr.appendChild(th);
+    const body = document.createElement('div');
+    body.className = 'edt-cal-body';
 
-      byDay.forEach(({ dayAbs, overlap, cover, skip }) => {
-        if (!overlap && skip[r]) return;
+    const gutter = document.createElement('div');
+    gutter.className = 'edt-gutter';
+    gutter.setAttribute('aria-hidden', 'true');
+    for (let h = 8; h <= 18; h++){
+      const label = document.createElement('div');
+      label.className = 'edt-hour-label';
+      label.style.top = ((h - 8) * HOUR_PX) + 'px';
+      label.textContent = h + 'h';
+      gutter.appendChild(label);
+    }
+    body.appendChild(gutter);
 
-        const td = document.createElement('td');
-        td.className = 'edt-cell';
-        const at = cover[r];
+    scheduleDayOrder.forEach((dayAbs, col) => {
+      const dayCol = document.createElement('div');
+      dayCol.className = 'edt-day-col' + (col === 0 ? ' is-today' : '');
+      dayCol.dataset.day = String(dayAbs);
+      dayCol.setAttribute('role', 'gridcell');
+      dayCol.setAttribute('aria-label', DAYS_ALL[dayAbs]);
 
-        if (!at.length){
-          const key = cellKey(r, dayAbs);
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'edt-cell-input';
-          input.placeholder = '—';
-          input.value = scheduleCellValue(key);
-          input.dataset.key = key;
-          input.setAttribute('aria-label', DAYS_ALL[dayAbs] + ' ' + slot.label);
-          input.addEventListener('input', () => {
+      for (let h = 8; h < 18; h++){
+        const line = document.createElement('div');
+        line.className = 'edt-hour-line';
+        line.style.top = ((h - 8) * HOUR_PX) + 'px';
+        dayCol.appendChild(line);
+        const half = document.createElement('div');
+        half.className = 'edt-hour-line is-half';
+        half.style.top = ((h - 8) * HOUR_PX + HOUR_PX / 2) + 'px';
+        dayCol.appendChild(half);
+      }
+      const endLine = document.createElement('div');
+      endLine.className = 'edt-hour-line';
+      endLine.style.top = (10 * HOUR_PX) + 'px';
+      dayCol.appendChild(endLine);
+
+      const blocks = collectDayBlocks(dayAbs);
+      blocks.forEach(block => {
+        const top = minToTop(block.startMin);
+        const height = rangeToHeight(block.startMin, block.endMin);
+        const lane = block._lane || 0;
+        const laneCount = block._laneCount || 1;
+        const widthPct = 100 / laneCount;
+        const leftPct = lane * widthPct;
+
+        const box = document.createElement('div');
+        box.className = 'edt-event';
+        box.style.top = top + 'px';
+        box.style.height = height + 'px';
+        box.style.left = 'calc(' + leftPct + '% + 1px)';
+        box.style.width = 'calc(' + widthPct + '% - 4px)';
+
+        const titleInput = document.createElement('textarea');
+        titleInput.className = 'edt-event-title';
+        titleInput.rows = 1;
+        titleInput.value = block.title;
+        titleInput.setAttribute('aria-label', 'Cours ' + DAYS_ALL[dayAbs] + ' ' + formatRange(block.startMin, block.endMin));
+        titleInput.addEventListener('click', e => e.stopPropagation());
+        titleInput.addEventListener('input', () => {
+          if (!isAuthed || applyingRemote) return;
+          if (block.kind === 'event'){
+            const ev = appData.schedule._events.find(e => e.id === block.id);
+            if (ev) ev.title = titleInput.value;
+          } else if (block.key){
+            if (titleInput.value) appData.schedule[block.key] = titleInput.value;
+            else delete appData.schedule[block.key];
+          }
+          saveSchedule();
+        });
+        box.appendChild(titleInput);
+
+        const meta = document.createElement('div');
+        meta.className = 'edt-event-meta';
+        meta.textContent = formatRange(block.startMin, block.endMin)
+          + (block.location ? ' · ' + block.location : '');
+        box.appendChild(meta);
+
+        if (block.kind === 'event'){
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'edt-event-del';
+          del.setAttribute('aria-label', 'Supprimer');
+          del.textContent = '×';
+          del.addEventListener('click', e => {
+            e.stopPropagation();
             if (!isAuthed || applyingRemote) return;
-            const val = input.value;
-            if (val) appData.schedule[key] = val;
-            else delete appData.schedule[key];
+            appData.schedule._events = appData.schedule._events.filter(ev => ev.id !== block.id);
             saveSchedule();
+            renderSchedule();
           });
-          input.addEventListener('focus', () => td.classList.add('is-focus'));
-          input.addEventListener('blur', () => td.classList.remove('is-focus'));
-          td.appendChild(input);
-          tr.appendChild(td);
-          return;
+          box.appendChild(del);
         }
 
-        const lanes = document.createElement('div');
-        lanes.className = 'edt-lanes';
+        dayCol.appendChild(box);
+      });
 
-        if (!overlap){
-          const { block } = at.find(x => x.isStart) || at[0];
-          const span = block.endSlot - block.startSlot;
-          if (span > 1) td.rowSpan = span;
-          appendEventEditor(lanes, block, dayAbs, slot, span);
-        } else {
-          const starts = at.filter(x => x.isStart);
-          if (starts.length){
-            starts.forEach(({ block }) => {
-              appendEventEditor(lanes, block, dayAbs, slot, block.endSlot - block.startSlot);
-            });
-          } else {
-            td.classList.add('edt-cell-cont');
-            at.forEach(() => {
-              const box = document.createElement('div');
-              box.className = 'edt-event edt-event-cont';
-              box.setAttribute('aria-hidden', 'true');
-              const mark = document.createElement('div');
-              mark.className = 'edt-event-meta';
-              mark.textContent = 'suite';
-              box.appendChild(mark);
-              lanes.appendChild(box);
-            });
+      dayCol.addEventListener('click', e => {
+        if (!isAuthed || applyingRemote) return;
+        if (e.target.closest('.edt-event')) return;
+        let startMin = yToMinutes(e.clientY, dayCol);
+        if (startMin >= DAY_END_MIN - 15) startMin = DAY_END_MIN - 60;
+        let endMin = Math.min(DAY_END_MIN, startMin + 60);
+        if (endMin <= startMin) endMin = startMin + 15;
+        ensureScheduleShape();
+        appData.schedule._events.push({
+          id: uid(),
+          day: dayAbs,
+          startMin,
+          endMin,
+          title: '',
+          location: '',
+          source: 'manual'
+        });
+        saveSchedule();
+        renderSchedule();
+        const freshCol = edtCal.querySelector('.edt-day-col[data-day="' + dayAbs + '"]');
+        if (freshCol){
+          const texts = freshCol.querySelectorAll('.edt-event-title');
+          for (let i = texts.length - 1; i >= 0; i--){
+            if (!texts[i].value){ texts[i].focus(); break; }
           }
         }
-
-        td.appendChild(lanes);
-        tr.appendChild(td);
       });
 
-      tbody.appendChild(tr);
+      body.appendChild(dayCol);
     });
-  }
 
-  function appendEventEditor(parent, block, dayAbs, slot, span){
-    const box = document.createElement('div');
-    box.className = 'edt-event' + (span > 1 ? ' edt-event-span' : '');
-    const titleInput = document.createElement('textarea');
-    titleInput.className = 'edt-event-title';
-    titleInput.rows = Math.max(1, span);
-    titleInput.value = block.title;
-    titleInput.setAttribute('aria-label', 'Cours ' + DAYS_ALL[dayAbs] + ' ' + slot.label);
-    titleInput.addEventListener('input', () => {
-      if (!isAuthed || applyingRemote) return;
-      if (block.kind === 'event'){
-        const ev = appData.schedule._events.find(e => e.id === block.id);
-        if (ev) ev.title = titleInput.value;
-      } else {
-        const k = block.key;
-        if (titleInput.value) appData.schedule[k] = titleInput.value;
-        else delete appData.schedule[k];
-      }
-      saveSchedule();
-    });
-    box.appendChild(titleInput);
-    const metaBits = [];
-    if (span > 1){
-      metaBits.push(SLOT_DEFS[block.startSlot].label.split('–')[0] + '–' + SLOT_DEFS[block.endSlot - 1].label.split('–')[1]);
-    }
-    if (block.location) metaBits.push(block.location);
-    if (metaBits.length){
-      const meta = document.createElement('div');
-      meta.className = 'edt-event-meta';
-      meta.textContent = metaBits.join(' · ');
-      box.appendChild(meta);
-    }
-    parent.appendChild(box);
+    edtCal.appendChild(body);
   }
 
   function applyScheduleToInputs(){
@@ -2025,9 +2113,19 @@
     if (!m) return null;
     const y = +m[1], mo = +m[2] - 1, d = +m[3], h = +m[4], mi = +m[5], s = +m[6];
     if (m[7] === 'Z') return new Date(Date.UTC(y, mo, d, h, mi, s));
-    // TZID : on interprète comme heure locale du navigateur (limite documentée pour VPS FR).
     void tzid;
     return new Date(y, mo, d, h, mi, s);
+  }
+
+  function rangeToMinutes(startDate, endDate){
+    let startMin = startDate.getHours() * 60 + startDate.getMinutes();
+    let endMin = endDate.getHours() * 60 + endDate.getMinutes();
+    if (endMin <= startMin) endMin += 24 * 60;
+    if (endMin <= DAY_START_MIN || startMin >= DAY_END_MIN) return null;
+    startMin = Math.max(startMin, DAY_START_MIN);
+    endMin = Math.min(endMin, DAY_END_MIN);
+    if (endMin <= startMin) return null;
+    return { startMin, endMin };
   }
 
   function parseIcsEvents(icsText){
@@ -2053,7 +2151,7 @@
         props[name] = { value, params };
       });
       if (!props.DTSTART) return;
-      if (/^\d{8}$/.test(props.DTSTART.value.trim())) return; // journée entière : hors grille horaire
+      if (/^\d{8}$/.test(props.DTSTART.value.trim())) return;
       const summary = props.SUMMARY ? props.SUMMARY.value.replace(/\\n/g, ' ').replace(/\\,/g, ',') : '(Sans titre)';
       const location = props.LOCATION ? props.LOCATION.value.replace(/\\,/g, ',') : '';
       const start = parseIcsDate(props.DTSTART.value, props.DTSTART.params.TZID);
@@ -2067,8 +2165,8 @@
         }
       }
       if (!start || !end) return;
-      const slots = rangeToSlots(start, end);
-      if (!slots) return;
+      const mins = rangeToMinutes(start, end);
+      if (!mins) return;
 
       let days = [];
       if (props.RRULE){
@@ -2083,10 +2181,6 @@
           } else {
             days.push(civilMondayIndex(start));
           }
-          if (/FREQ=(DAILY|MONTHLY|YEARLY)/i.test(rule) && !/FREQ=WEEKLY/i.test(rule)){
-            warnings.push('Récurrence non hebdomadaire ignorée : ' + summary);
-            return;
-          }
         } else {
           warnings.push('RRULE non gérée (seul WEEKLY est supporté) : ' + summary);
           days.push(civilMondayIndex(start));
@@ -2099,8 +2193,8 @@
         out.push({
           id: uid(),
           day,
-          startSlot: slots.startSlot,
-          endSlot: slots.endSlot,
+          startMin: mins.startMin,
+          endMin: mins.endMin,
           title: summary,
           location,
           source: 'ics'
@@ -2159,7 +2253,10 @@
           const m = /^(\d+)-(\d+)$/.exec(k);
           if (!m || !scheduleCellValue(k).trim()) return false;
           const slot = +m[1], day = +m[2];
-          return day === ev.day && slot >= ev.startSlot && slot < ev.endSlot;
+          const startMin = LEGACY_SLOT_START[slot];
+          if (startMin == null || day !== ev.day) return false;
+          const endMin = startMin + 60;
+          return startMin < ev.endMin && ev.startMin < endMin;
         });
       if (clash) collisions++;
       appData.schedule._events.push(ev);
@@ -2188,14 +2285,14 @@
       }
       const { events, warnings } = parseIcsEvents(ics);
       if (!events.length){
-        throw new Error('Aucun événement importable (créneaux 8h–18h, hors pause déjeuner 12h–13h).');
+        throw new Error('Aucun événement importable entre 8h et 18h.');
       }
       const collisions = mergeImportedEvents(events, mode);
       saveSchedule();
       renderSchedule();
       let msg = events.length + ' événement' + (events.length > 1 ? 's' : '') + ' importé' + (events.length > 1 ? 's' : '')
         + (mode === 'replace' ? ' (emploi du temps remplacé)' : ' (ajoutés)');
-      if (collisions) msg += ' — ' + collisions + ' chevauchement' + (collisions > 1 ? 's' : '') + ' affiché' + (collisions > 1 ? 's' : '') + ' côte à côte.';
+      if (collisions) msg += ' - ' + collisions + ' chevauchement' + (collisions > 1 ? 's' : '') + ' affiché' + (collisions > 1 ? 's' : '') + ' côte à côte.';
       if (warnings.length) msg += ' ' + warnings.slice(0, 2).join(' ');
       setEdtFeedback(msg, 'ok');
       edtFileInput.value = '';
@@ -2450,10 +2547,10 @@
       'auth/weak-password': 'Mot de passe trop court (6 caractères minimum).',
       'auth/invalid-email': 'Adresse e-mail invalide.',
       'auth/missing-email': 'Indique ton adresse e-mail.',
-      'auth/too-many-requests': 'Trop de tentatives — réessaie dans quelques minutes.',
-      'auth/network-request-failed': 'Hors ligne — réessaie quand tu es connecté.'
+      'auth/too-many-requests': 'Trop de tentatives - réessaie dans quelques minutes.',
+      'auth/network-request-failed': 'Hors ligne - réessaie quand tu es connecté.'
     };
-    return map[code] || 'Une erreur est survenue — réessaie.';
+    return map[code] || 'Une erreur est survenue - réessaie.';
   }
 
   function setStatus(status){
@@ -2626,7 +2723,7 @@
     } catch (err) {
       if (!navigator.onLine) setStatus('offline');
       else setStatus('offline');
-      throw new Error('Hors ligne — réessaie.');
+      throw new Error('Hors ligne - réessaie.');
     }
   }
 
@@ -2649,7 +2746,7 @@
     if (!trimmed) throw new Error('Indique ton identifiant ou ton e-mail.');
     if (validateEmail(trimmed)) return normalizeEmail(trimmed);
     if (!validateUsername(trimmed)){
-      throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+      throw new Error('Identifiant invalide (3-20 caractères, lettres, chiffres, _ ou -).');
     }
     const key = normalizeUsername(trimmed);
     const snap = await getDoc(doc(db, USERNAMES_COLLECTION, key));
@@ -2673,7 +2770,7 @@
       }
     },
     async signUp(rawUsername, rawEmail, password, preferences){
-      if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
+      if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3-20 caractères, lettres, chiffres, _ ou -).');
       const email = normalizeEmail(rawEmail);
       if (!validateEmail(email)) throw new Error('Adresse e-mail invalide.');
       if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
@@ -2710,7 +2807,7 @@
         try { await deleteUser(cred.user); } catch (_) {}
         if (err.message === 'Identifiant déjà pris.') throw err;
         if (err.message && !err.code) throw err;
-        throw new Error(authErrorMessage(err.code) || 'Impossible de créer le compte — réessaie.');
+        throw new Error(authErrorMessage(err.code) || 'Impossible de créer le compte - réessaie.');
       }
     },
     async resetPassword(rawEmail){
