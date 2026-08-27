@@ -745,13 +745,15 @@
   }
 
   @media (max-width:640px){
+    /* drop binder decoration on phone — use full width */
     :root{
-      --binder-gutter:24px;
-      --binder-holes-left:6px;
-      --binder-holes-size:7px;
-      --binder-holes-gap:52px;
-      --binder-spine-width:14px;
+      --binder-gutter:18px;
+      --binder-holes-left:0;
+      --binder-holes-size:0;
+      --binder-spine-width:0;
     }
+    body::before,
+    body::after{ display:none; }
     header{ padding:40px 18px 24px var(--binder-gutter); }
     .global-actions{
       top:12px; right:12px;
@@ -778,11 +780,6 @@
     .panel h2{ font-size:clamp(22px, 6vw, 26px); }
   }
   @media (max-width:380px){
-    :root{
-      --binder-gutter:18px;
-      --binder-spine-width:10px;
-    }
-    body::before{ opacity:0; } /* slim spine only — holes add noise at this width */
     .tab{ font-size:11px; padding:9px 10px; }
   }
 </style>
