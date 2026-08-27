@@ -379,7 +379,10 @@
   .tab[data-tab="sport"]{ background:var(--c-sport); }
   .tab[data-tab="eng"]{ background:var(--c-eng); }
   .tab[data-tab="ger"]{ background:var(--c-ger); }
-  .tab[data-tab="today"]{ background:var(--ink); }
+  .tab[data-tab="today"]{
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
+  }
   .tab[data-tab="edt"]{ background:#5C5F66; }
   .tab[data-tab="res"]{ background:var(--c-res); }
 
@@ -415,6 +418,10 @@
     border-radius:20px;
     color:#fff;
     margin-bottom:18px;
+  }
+  .panel .tag.tag-ink{
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
   }
 
   .chapter{
@@ -697,7 +704,7 @@
   <!-- TODAY -->
   <section class="panel active" id="panel-today">
     <h2>Aujourd'hui</h2>
-    <span class="tag" style="background:var(--ink)">Liste du jour</span>
+    <span class="tag tag-ink">Liste du jour</span>
     <div class="sync-data">
       <div class="today-input">
         <input type="text" id="todo-text" placeholder="Ajouter une tâche…">
