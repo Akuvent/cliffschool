@@ -175,6 +175,15 @@
     border-radius:12px;
     padding:16px 18px;
   }
+  .auth-heading{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin-bottom:12px;
+  }
   .auth-tabs{
     display:flex;
     gap:6px;
@@ -544,10 +553,11 @@
   <p class="sub">Ton tableau de bord pour la rentrée : avance sur le programme de Maths et NSI, une liste de tâches du jour, et les ressources qui valent le coup.</p>
 
   <div class="auth-bar" id="auth-bar">
+    <p class="auth-heading">Ton compte</p>
     <div class="auth-forms" id="auth-forms">
       <div class="auth-tabs">
-        <button type="button" class="auth-tab active" data-auth-tab="login">Connexion</button>
-        <button type="button" class="auth-tab" data-auth-tab="signup">Créer un compte</button>
+        <button type="button" class="auth-tab active" data-auth-tab="login">Se connecter</button>
+        <button type="button" class="auth-tab" data-auth-tab="signup">S'inscrire</button>
       </div>
       <form id="auth-login" class="auth-form">
         <label for="login-username">Identifiant
@@ -569,10 +579,7 @@
         <label for="signup-password2">Confirmer le mot de passe
           <input type="password" id="signup-password2" autocomplete="new-password" required minlength="6">
         </label>
-        <label for="signup-school">Code école
-          <input type="text" id="signup-school" autocomplete="off" required>
-        </label>
-        <button type="submit">Créer un compte</button>
+        <button type="submit">S'inscrire</button>
         <p class="auth-error" id="signup-error" hidden></p>
       </form>
     </div>
@@ -1062,8 +1069,7 @@
     try {
       await window.CarnetSync.signUp(
         document.getElementById('signup-username').value,
-        pw,
-        document.getElementById('signup-school').value
+        pw
       );
     } catch (err) {
       showAuthError(errEl, err.message);
@@ -1116,7 +1122,6 @@
     onSnapshot
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-  const SCHOOL_CODE = 'CLIFF2026';
   const FIRESTORE_COLLECTION = 'users';
   const EMAIL_DOMAIN = '@cliffschool.local';
 
@@ -1336,9 +1341,8 @@
         throw new Error(authErrorMessage(err.code));
       }
     },
-    async signUp(rawUsername, password, schoolCode){
+    async signUp(rawUsername, password){
       if (!validateUsername(rawUsername)) throw new Error('Identifiant invalide (3–20 caractères, lettres, chiffres, _ ou -).');
-      if (schoolCode.trim() !== SCHOOL_CODE) throw new Error('Code école incorrect.');
       if (password.length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
       try {
         const cred = await createUserWithEmailAndPassword(auth, toEmail(rawUsername), password);
