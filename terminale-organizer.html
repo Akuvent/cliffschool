@@ -674,6 +674,196 @@
   #todo-list .del:hover{ opacity:1; color:var(--red); }
   .empty{ color:var(--ink-soft); font-size:14px; font-style:italic; padding:14px 0; }
 
+  /* Schedule / EDT */
+  .edt-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 14px;
+    align-items:flex-end;
+    margin-bottom:16px;
+  }
+  .edt-toolbar .edt-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:min(100%, 200px);
+  }
+  .edt-toolbar label,
+  .edt-mode-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .edt-toolbar input[type=file]{
+    font-family:'Work Sans', sans-serif;
+    font-size:13px;
+    color:var(--ink);
+    max-width:100%;
+  }
+  .edt-mode{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .edt-mode label{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:44px;
+    padding:0 12px;
+    border:1.5px solid var(--paper-dark);
+    border-radius:8px;
+    font-family:'Work Sans', sans-serif;
+    font-size:13.5px;
+    text-transform:none;
+    letter-spacing:0;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    background:var(--paper);
+  }
+  .edt-mode input{
+    width:18px;
+    height:18px;
+    accent-color:var(--ink);
+  }
+  .edt-toolbar button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    background:var(--btn-primary-bg);
+    color:var(--btn-primary-fg);
+    border:none;
+    padding:0 18px;
+    min-height:44px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .edt-toolbar button:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+  }
+  .edt-feedback{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+    min-height:1.2em;
+  }
+  .edt-feedback.is-error{ color:var(--red); }
+  .edt-feedback.is-ok{ color:var(--ink); }
+  .edt-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    max-width:100%;
+  }
+  #schedule-table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:720px;
+    font-size:13px;
+  }
+  #schedule-table th,
+  #schedule-table td{
+    vertical-align:top;
+  }
+  #schedule-table thead th{
+    text-align:left;
+    padding:8px 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    color:var(--ink-soft);
+    font-size:11px;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  #schedule-table thead th .edt-today-mark{
+    display:block;
+    margin-top:2px;
+    font-size:10px;
+    font-weight:500;
+    letter-spacing:0.02em;
+    text-transform:none;
+    color:var(--ink);
+  }
+  #schedule-table .edt-slot-label{
+    padding:6px 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    border-top:1px dashed var(--paper-dark);
+    white-space:nowrap;
+  }
+  #schedule-table .edt-cell{
+    padding:2px;
+    border-top:1px dashed var(--paper-dark);
+    border-left:1px dashed var(--paper-dark);
+    min-width:88px;
+  }
+  #schedule-table .edt-cell.is-focus{
+    background:var(--paper);
+  }
+  #schedule-table .edt-cell-input{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-family:'Work Sans', sans-serif;
+    font-size:12.5px;
+    padding:8px;
+    color:var(--ink);
+    outline:none;
+  }
+  #schedule-table .edt-lanes{
+    display:flex;
+    gap:4px;
+    align-items:stretch;
+    min-height:100%;
+  }
+  #schedule-table .edt-event{
+    flex:1 1 0;
+    min-width:0;
+    border:1px solid var(--paper-dark);
+    border-radius:6px;
+    background:var(--paper-dark);
+    padding:6px 8px;
+    min-height:44px;
+  }
+  #schedule-table .edt-event-span{
+    height:100%;
+  }
+  #schedule-table .edt-cell-cont .edt-event-cont{
+    min-height:28px;
+    opacity:0.85;
+    border-style:dashed;
+  }
+  #schedule-table td.edt-cell[rowspan] .edt-event{
+    min-height:calc(100% - 4px);
+  }
+  #schedule-table .edt-event-title{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-family:'Work Sans', sans-serif;
+    font-size:12.5px;
+    color:var(--ink);
+    outline:none;
+    resize:none;
+    field-sizing:content;
+    min-height:1.2em;
+  }
+  #schedule-table .edt-event-meta{
+    margin-top:2px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+  }
+  body.dark #schedule-table .edt-event{
+    background:#2A314A;
+    border-color:var(--line);
+  }
+
   /* Resources panel */
   .res-group{ margin-bottom:28px; }
   .res-group h3{
@@ -1040,14 +1230,29 @@
   <!-- SCHEDULE -->
   <section class="panel" id="panel-edt">
     <h2>Emploi du temps</h2>
-    <span class="tag" style="background:#5C5F66">À compléter à la rentrée</span>
+    <span class="tag" style="background:#5C5F66">Semaine glissante</span>
     <div class="sync-data">
-      <div class="note" style="margin-bottom:20px;">Emplacement réservé — tu n'as pas encore ton emploi du temps définitif. Clique dans une case pour noter un cours une fois qu'il te sera donné (ex. « Maths — salle 12 »). Tout est synchronisé avec ton compte.</div>
-      <div style="overflow-x:auto;">
-        <table id="schedule-table" style="border-collapse:collapse; width:100%; min-width:680px; font-size:13px;">
+      <div class="note" style="margin-bottom:16px;">Clique dans une case pour noter un cours ou une session d’étude (ex. « Maths — salle 12 »). Tu peux aussi importer un export Google Calendar (.ics ou .zip). Tout est synchronisé avec ton compte.</div>
+      <div class="edt-toolbar">
+        <div class="edt-field">
+          <label for="edt-file">Fichier calendrier</label>
+          <input type="file" id="edt-file" accept=".ics,.ical,.zip,text/calendar,application/zip,application/x-zip-compressed">
+        </div>
+        <div class="edt-field">
+          <span class="edt-mode-label" id="edt-mode-label">Mode d’import</span>
+          <div class="edt-mode" role="radiogroup" aria-labelledby="edt-mode-label">
+            <label><input type="radio" name="edt-import-mode" value="add" checked> Ajouter</label>
+            <label><input type="radio" name="edt-import-mode" value="replace"> Remplacer</label>
+          </div>
+        </div>
+        <button type="button" id="edt-import-btn">Importer</button>
+      </div>
+      <p class="edt-feedback" id="edt-feedback" role="status" aria-live="polite"></p>
+      <div class="edt-scroll">
+        <table id="schedule-table">
           <thead>
             <tr>
-              <th style="text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;">Créneau</th>
+              <th scope="col">Créneau</th>
             </tr>
           </thead>
           <tbody id="schedule-body"></tbody>
@@ -1491,55 +1696,515 @@
   setMode(localStorage.getItem('dark-mode') === '1');
   modeBtn.addEventListener('click', () => setMode(!document.body.classList.contains('dark')));
 
-  // Schedule grid
-  const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
-  const slots = ['8h–9h','9h–10h','10h–11h','11h–12h','13h–14h','14h–15h','15h–16h','16h–17h','17h–18h'];
+  // Schedule grid — stratégie import : .ics / .zip côté client (pas d’API Google :
+  // OAuth GIS + Client ID GCP serait viable en pure SPA, mais impose une config
+  // Cloud Console à chaque utilisateur ; l’export Google .ics/.ical.zip suffit en statique).
+  const DAYS_ALL = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  const SLOT_DEFS = [
+    { label: '8h–9h', start: 8, end: 9 },
+    { label: '9h–10h', start: 9, end: 10 },
+    { label: '10h–11h', start: 10, end: 11 },
+    { label: '11h–12h', start: 11, end: 12 },
+    { label: '13h–14h', start: 13, end: 14 },
+    { label: '14h–15h', start: 14, end: 15 },
+    { label: '15h–16h', start: 15, end: 16 },
+    { label: '16h–17h', start: 16, end: 17 },
+    { label: '17h–18h', start: 17, end: 18 }
+  ];
+  const ICS_BYDAY = { MO: 0, TU: 1, WE: 2, TH: 3, FR: 4, SA: 5, SU: 6 };
   const theadRow = document.querySelector('#schedule-table thead tr');
-  days.forEach(d => {
-    const th = document.createElement('th');
-    th.textContent = d;
-    th.style.cssText = "text-align:left; padding:8px 10px; font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--ink-soft); font-size:11px; text-transform:uppercase;";
-    theadRow.appendChild(th);
-  });
-
-  const scheduleInputs = {};
   const tbody = document.getElementById('schedule-body');
-  slots.forEach((slot, r) => {
-    const tr = document.createElement('tr');
-    const th = document.createElement('td');
-    th.textContent = slot;
-    th.style.cssText = "padding:6px 10px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); border-top:1px dashed var(--paper-dark); white-space:nowrap;";
-    tr.appendChild(th);
-    days.forEach((d, c) => {
-      const td = document.createElement('td');
-      td.style.cssText = "padding:2px; border-top:1px dashed var(--paper-dark); border-left:1px dashed var(--paper-dark);";
-      const cellInput = document.createElement('input');
-      cellInput.type = 'text';
-      cellInput.placeholder = '—';
-      const key = r + '-' + c;
-      cellInput.dataset.key = key;
-      cellInput.style.cssText = "width:100%; border:none; background:transparent; font-family:'Work Sans',sans-serif; font-size:12.5px; padding:8px 8px; color:var(--ink); outline:none;";
-      cellInput.addEventListener('input', () => {
-        if (!isAuthed || applyingRemote) return;
-        appData.schedule[key] = cellInput.value;
-        window.CarnetSync.saveField('schedule', appData.schedule);
-      });
-      cellInput.addEventListener('focus', () => td.style.background = 'var(--paper)');
-      cellInput.addEventListener('blur', () => td.style.background = 'transparent');
-      td.appendChild(cellInput);
-      tr.appendChild(td);
-      scheduleInputs[key] = cellInput;
+  const edtFeedback = document.getElementById('edt-feedback');
+  const edtFileInput = document.getElementById('edt-file');
+  const edtImportBtn = document.getElementById('edt-import-btn');
+  let scheduleDayOrder = [];
+  let midnightTimer = null;
+
+  function civilMondayIndex(date){
+    const d = (date || new Date()).getDay();
+    return d === 0 ? 6 : d - 1;
+  }
+
+  function rollingDayOrder(date){
+    const start = civilMondayIndex(date);
+    return Array.from({ length: 7 }, (_, i) => (start + i) % 7);
+  }
+
+  function cellKey(slot, dayAbs){
+    return slot + '-' + dayAbs;
+  }
+
+  function ensureScheduleShape(){
+    if (!appData.schedule || typeof appData.schedule !== 'object') appData.schedule = {};
+    if (!Array.isArray(appData.schedule._events)) appData.schedule._events = [];
+  }
+
+  function scheduleCellValue(key){
+    const v = appData.schedule[key];
+    return typeof v === 'string' ? v : '';
+  }
+
+  function uid(){
+    return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function saveSchedule(){
+    if (!isAuthed || applyingRemote) return;
+    window.CarnetSync.saveField('schedule', appData.schedule);
+  }
+
+  function setEdtFeedback(msg, kind){
+    edtFeedback.textContent = msg || '';
+    edtFeedback.classList.toggle('is-error', kind === 'error');
+    edtFeedback.classList.toggle('is-ok', kind === 'ok');
+  }
+
+  function rangeToSlots(startDate, endDate){
+    let startH = startDate.getHours() + startDate.getMinutes() / 60;
+    let endH = endDate.getHours() + endDate.getMinutes() / 60;
+    if (endH <= startH) endH += 24;
+    let startSlot = -1;
+    let endSlot = -1;
+    for (let i = 0; i < SLOT_DEFS.length; i++){
+      const s = SLOT_DEFS[i];
+      if (startSlot < 0 && startH < s.end && endH > s.start) startSlot = i;
+      if (startH < s.end && endH > s.start) endSlot = i + 1;
+    }
+    if (startSlot < 0 || endSlot <= startSlot) return null;
+    return { startSlot, endSlot };
+  }
+
+  function eventsOverlap(a, b){
+    return a.day === b.day && a.startSlot < b.endSlot && b.startSlot < a.endSlot;
+  }
+
+  function assignLanes(dayEvents){
+    const sorted = dayEvents.slice().sort((a, b) => a.startSlot - b.startSlot || b.endSlot - a.endSlot);
+    const laneEnds = [];
+    sorted.forEach(ev => {
+      let lane = laneEnds.findIndex(end => end <= ev.startSlot);
+      if (lane < 0){
+        lane = laneEnds.length;
+        laneEnds.push(ev.endSlot);
+      } else {
+        laneEnds[lane] = ev.endSlot;
+      }
+      ev._lane = lane;
     });
-    tbody.appendChild(tr);
-  });
+    return laneEnds.length || 1;
+  }
+
+  function collectDayBlocks(dayAbs){
+    ensureScheduleShape();
+    const blocks = [];
+    appData.schedule._events.forEach(ev => {
+      if (ev.day !== dayAbs) return;
+      if (typeof ev.startSlot !== 'number' || typeof ev.endSlot !== 'number') return;
+      if (ev.endSlot <= ev.startSlot) return;
+      blocks.push({
+        id: ev.id,
+        day: ev.day,
+        startSlot: ev.startSlot,
+        endSlot: Math.min(ev.endSlot, SLOT_DEFS.length),
+        title: ev.title || '',
+        location: ev.location || '',
+        kind: 'event'
+      });
+    });
+    for (let r = 0; r < SLOT_DEFS.length; r++){
+      const key = cellKey(r, dayAbs);
+      const text = scheduleCellValue(key);
+      if (!text.trim()) continue;
+      const covered = blocks.some(b => b.kind === 'event' && b.startSlot <= r && r < b.endSlot);
+      if (covered) continue;
+      blocks.push({
+        id: 'cell:' + key,
+        day: dayAbs,
+        startSlot: r,
+        endSlot: r + 1,
+        title: text,
+        location: '',
+        kind: 'cell',
+        key
+      });
+    }
+    assignLanes(blocks);
+    return blocks;
+  }
+
+  function buildHeader(){
+    while (theadRow.children.length > 1) theadRow.removeChild(theadRow.lastChild);
+    scheduleDayOrder.forEach((dayAbs, col) => {
+      const th = document.createElement('th');
+      th.scope = 'col';
+      th.textContent = DAYS_ALL[dayAbs];
+      if (col === 0){
+        const mark = document.createElement('span');
+        mark.className = 'edt-today-mark';
+        mark.textContent = 'Aujourd’hui';
+        th.appendChild(mark);
+        th.setAttribute('aria-current', 'date');
+      }
+      theadRow.appendChild(th);
+    });
+  }
+
+  function renderSchedule(){
+    ensureScheduleShape();
+    scheduleDayOrder = rollingDayOrder();
+    buildHeader();
+    tbody.textContent = '';
+
+    const byDay = scheduleDayOrder.map(dayAbs => {
+      const blocks = collectDayBlocks(dayAbs);
+      const overlap = blocks.some((a, i) => blocks.some((b, j) => j > i && eventsOverlap(a, b)));
+      const cover = Array.from({ length: SLOT_DEFS.length }, () => []);
+      blocks.forEach(b => {
+        for (let r = b.startSlot; r < b.endSlot; r++) cover[r].push({ block: b, isStart: r === b.startSlot });
+      });
+      const skip = Array(SLOT_DEFS.length).fill(false);
+      if (!overlap){
+        blocks.forEach(b => {
+          for (let r = b.startSlot + 1; r < b.endSlot; r++) skip[r] = true;
+        });
+      }
+      return { dayAbs, blocks, overlap, cover, skip };
+    });
+
+    SLOT_DEFS.forEach((slot, r) => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.scope = 'row';
+      th.className = 'edt-slot-label';
+      th.textContent = slot.label;
+      tr.appendChild(th);
+
+      byDay.forEach(({ dayAbs, overlap, cover, skip }) => {
+        if (!overlap && skip[r]) return;
+
+        const td = document.createElement('td');
+        td.className = 'edt-cell';
+        const at = cover[r];
+
+        if (!at.length){
+          const key = cellKey(r, dayAbs);
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'edt-cell-input';
+          input.placeholder = '—';
+          input.value = scheduleCellValue(key);
+          input.dataset.key = key;
+          input.setAttribute('aria-label', DAYS_ALL[dayAbs] + ' ' + slot.label);
+          input.addEventListener('input', () => {
+            if (!isAuthed || applyingRemote) return;
+            const val = input.value;
+            if (val) appData.schedule[key] = val;
+            else delete appData.schedule[key];
+            saveSchedule();
+          });
+          input.addEventListener('focus', () => td.classList.add('is-focus'));
+          input.addEventListener('blur', () => td.classList.remove('is-focus'));
+          td.appendChild(input);
+          tr.appendChild(td);
+          return;
+        }
+
+        const lanes = document.createElement('div');
+        lanes.className = 'edt-lanes';
+
+        if (!overlap){
+          const { block } = at.find(x => x.isStart) || at[0];
+          const span = block.endSlot - block.startSlot;
+          if (span > 1) td.rowSpan = span;
+          appendEventEditor(lanes, block, dayAbs, slot, span);
+        } else {
+          const starts = at.filter(x => x.isStart);
+          if (starts.length){
+            starts.forEach(({ block }) => {
+              appendEventEditor(lanes, block, dayAbs, slot, block.endSlot - block.startSlot);
+            });
+          } else {
+            td.classList.add('edt-cell-cont');
+            at.forEach(() => {
+              const box = document.createElement('div');
+              box.className = 'edt-event edt-event-cont';
+              box.setAttribute('aria-hidden', 'true');
+              const mark = document.createElement('div');
+              mark.className = 'edt-event-meta';
+              mark.textContent = 'suite';
+              box.appendChild(mark);
+              lanes.appendChild(box);
+            });
+          }
+        }
+
+        td.appendChild(lanes);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function appendEventEditor(parent, block, dayAbs, slot, span){
+    const box = document.createElement('div');
+    box.className = 'edt-event' + (span > 1 ? ' edt-event-span' : '');
+    const titleInput = document.createElement('textarea');
+    titleInput.className = 'edt-event-title';
+    titleInput.rows = Math.max(1, span);
+    titleInput.value = block.title;
+    titleInput.setAttribute('aria-label', 'Cours ' + DAYS_ALL[dayAbs] + ' ' + slot.label);
+    titleInput.addEventListener('input', () => {
+      if (!isAuthed || applyingRemote) return;
+      if (block.kind === 'event'){
+        const ev = appData.schedule._events.find(e => e.id === block.id);
+        if (ev) ev.title = titleInput.value;
+      } else {
+        const k = block.key;
+        if (titleInput.value) appData.schedule[k] = titleInput.value;
+        else delete appData.schedule[k];
+      }
+      saveSchedule();
+    });
+    box.appendChild(titleInput);
+    const metaBits = [];
+    if (span > 1){
+      metaBits.push(SLOT_DEFS[block.startSlot].label.split('–')[0] + '–' + SLOT_DEFS[block.endSlot - 1].label.split('–')[1]);
+    }
+    if (block.location) metaBits.push(block.location);
+    if (metaBits.length){
+      const meta = document.createElement('div');
+      meta.className = 'edt-event-meta';
+      meta.textContent = metaBits.join(' · ');
+      box.appendChild(meta);
+    }
+    parent.appendChild(box);
+  }
 
   function applyScheduleToInputs(){
     applyingRemote = true;
-    Object.keys(scheduleInputs).forEach(key => {
-      scheduleInputs[key].value = appData.schedule[key] || '';
-    });
+    renderSchedule();
     applyingRemote = false;
   }
+
+  function msUntilNextMidnight(){
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+    return next - now;
+  }
+
+  function scheduleMidnightRefresh(){
+    if (midnightTimer) clearTimeout(midnightTimer);
+    midnightTimer = setTimeout(() => {
+      renderSchedule();
+      scheduleMidnightRefresh();
+    }, msUntilNextMidnight());
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible'){
+      const next = rollingDayOrder().join(',');
+      if (next !== scheduleDayOrder.join(',')) renderSchedule();
+    }
+  });
+  scheduleMidnightRefresh();
+  renderSchedule();
+
+  function unfoldIcs(text){
+    return text.replace(/\r\n/g, '\n').replace(/\n[ \t]/g, '');
+  }
+
+  function parseIcsDate(raw, tzid){
+    if (!raw) return null;
+    const v = raw.trim();
+    if (/^\d{8}$/.test(v)){
+      const y = +v.slice(0, 4), m = +v.slice(4, 6) - 1, d = +v.slice(6, 8);
+      return new Date(y, m, d, 0, 0, 0);
+    }
+    const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/.exec(v);
+    if (!m) return null;
+    const y = +m[1], mo = +m[2] - 1, d = +m[3], h = +m[4], mi = +m[5], s = +m[6];
+    if (m[7] === 'Z') return new Date(Date.UTC(y, mo, d, h, mi, s));
+    // TZID : on interprète comme heure locale du navigateur (limite documentée pour VPS FR).
+    void tzid;
+    return new Date(y, mo, d, h, mi, s);
+  }
+
+  function parseIcsEvents(icsText){
+    const text = unfoldIcs(icsText);
+    const blocks = text.split('BEGIN:VEVENT').slice(1);
+    const out = [];
+    const warnings = [];
+    blocks.forEach(block => {
+      const body = block.split('END:VEVENT')[0] || '';
+      const props = {};
+      body.split('\n').forEach(line => {
+        if (!line || line.startsWith(' ')) return;
+        const idx = line.indexOf(':');
+        if (idx < 0) return;
+        const left = line.slice(0, idx);
+        const value = line.slice(idx + 1);
+        const name = left.split(';')[0].toUpperCase();
+        const params = {};
+        left.split(';').slice(1).forEach(p => {
+          const eq = p.indexOf('=');
+          if (eq > 0) params[p.slice(0, eq).toUpperCase()] = p.slice(eq + 1);
+        });
+        props[name] = { value, params };
+      });
+      if (!props.DTSTART) return;
+      if (/^\d{8}$/.test(props.DTSTART.value.trim())) return; // journée entière : hors grille horaire
+      const summary = props.SUMMARY ? props.SUMMARY.value.replace(/\\n/g, ' ').replace(/\\,/g, ',') : '(Sans titre)';
+      const location = props.LOCATION ? props.LOCATION.value.replace(/\\,/g, ',') : '';
+      const start = parseIcsDate(props.DTSTART.value, props.DTSTART.params.TZID);
+      let end = props.DTEND ? parseIcsDate(props.DTEND.value, props.DTEND.params.TZID) : null;
+      if (!end && props.DURATION && props.DURATION.value){
+        const dm = /^PT(?:(\d+)H)?(?:(\d+)M)?/i.exec(props.DURATION.value);
+        if (dm && start){
+          end = new Date(start.getTime());
+          end.setHours(end.getHours() + (+dm[1] || 0));
+          end.setMinutes(end.getMinutes() + (+dm[2] || 0));
+        }
+      }
+      if (!start || !end) return;
+      const slots = rangeToSlots(start, end);
+      if (!slots) return;
+
+      let days = [];
+      if (props.RRULE){
+        const rule = props.RRULE.value;
+        if (/FREQ=WEEKLY/i.test(rule)){
+          const by = /BYDAY=([^;]+)/i.exec(rule);
+          if (by){
+            by[1].split(',').forEach(tok => {
+              const code = tok.replace(/^-?\d+/, '').toUpperCase();
+              if (ICS_BYDAY[code] != null) days.push(ICS_BYDAY[code]);
+            });
+          } else {
+            days.push(civilMondayIndex(start));
+          }
+          if (/FREQ=(DAILY|MONTHLY|YEARLY)/i.test(rule) && !/FREQ=WEEKLY/i.test(rule)){
+            warnings.push('Récurrence non hebdomadaire ignorée : ' + summary);
+            return;
+          }
+        } else {
+          warnings.push('RRULE non gérée (seul WEEKLY est supporté) : ' + summary);
+          days.push(civilMondayIndex(start));
+        }
+      } else {
+        days.push(civilMondayIndex(start));
+      }
+      days = [...new Set(days)];
+      days.forEach(day => {
+        out.push({
+          id: uid(),
+          day,
+          startSlot: slots.startSlot,
+          endSlot: slots.endSlot,
+          title: summary,
+          location,
+          source: 'ics'
+        });
+      });
+    });
+    return { events: out, warnings };
+  }
+
+  function loadJSZip(){
+    if (window.JSZip) return Promise.resolve(window.JSZip);
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+      s.async = true;
+      s.onload = () => {
+        if (window.JSZip) resolve(window.JSZip);
+        else reject(new Error('JSZip indisponible après chargement.'));
+      };
+      s.onerror = () => reject(new Error('Impossible de charger le lecteur ZIP (réseau / CDN).'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function readCalendarFile(file){
+    const name = (file.name || '').toLowerCase();
+    const isZip = name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-zip-compressed';
+    if (isZip){
+      const JSZip = await loadJSZip();
+      const zip = await JSZip.loadAsync(await file.arrayBuffer());
+      const entries = Object.keys(zip.files).filter(p => /\.(ics|ical)$/i.test(p) && !zip.files[p].dir);
+      if (!entries.length) throw new Error('Aucune entrée .ics dans ce fichier ZIP.');
+      const preferred = entries.find(p => /calendar|enseignement|emploi|edt/i.test(p)) || entries[0];
+      return zip.files[preferred].async('string');
+    }
+    return file.text();
+  }
+
+  function clearImportableSchedule(){
+    ensureScheduleShape();
+    Object.keys(appData.schedule).forEach(k => {
+      if (k.startsWith('_')) return;
+      delete appData.schedule[k];
+    });
+    appData.schedule._events = [];
+  }
+
+  function mergeImportedEvents(events, mode){
+    ensureScheduleShape();
+    let collisions = 0;
+    if (mode === 'replace') clearImportableSchedule();
+    events.forEach(ev => {
+      const clash = appData.schedule._events.some(e => eventsOverlap(e, ev))
+        || Object.keys(appData.schedule).some(k => {
+          if (k.startsWith('_')) return false;
+          const m = /^(\d+)-(\d+)$/.exec(k);
+          if (!m || !scheduleCellValue(k).trim()) return false;
+          const slot = +m[1], day = +m[2];
+          return day === ev.day && slot >= ev.startSlot && slot < ev.endSlot;
+        });
+      if (clash) collisions++;
+      appData.schedule._events.push(ev);
+    });
+    return collisions;
+  }
+
+  edtImportBtn.addEventListener('click', async () => {
+    if (!isAuthed){
+      setEdtFeedback('Connecte-toi pour importer et synchroniser l’emploi du temps.', 'error');
+      return;
+    }
+    const file = edtFileInput.files && edtFileInput.files[0];
+    if (!file){
+      setEdtFeedback('Choisis un fichier .ics ou .zip exporté depuis Google Calendar.', 'error');
+      return;
+    }
+    const modeEl = document.querySelector('input[name="edt-import-mode"]:checked');
+    const mode = modeEl ? modeEl.value : 'add';
+    edtImportBtn.disabled = true;
+    setEdtFeedback('Import en cours…');
+    try {
+      const ics = await readCalendarFile(file);
+      if (!/BEGIN:VCALENDAR/i.test(ics) && !/BEGIN:VEVENT/i.test(ics)){
+        throw new Error('Fichier invalide : calendrier iCalendar attendu.');
+      }
+      const { events, warnings } = parseIcsEvents(ics);
+      if (!events.length){
+        throw new Error('Aucun événement importable (créneaux 8h–18h, hors pause déjeuner 12h–13h).');
+      }
+      const collisions = mergeImportedEvents(events, mode);
+      saveSchedule();
+      renderSchedule();
+      let msg = events.length + ' événement' + (events.length > 1 ? 's' : '') + ' importé' + (events.length > 1 ? 's' : '')
+        + (mode === 'replace' ? ' (emploi du temps remplacé)' : ' (ajoutés)');
+      if (collisions) msg += ' — ' + collisions + ' chevauchement' + (collisions > 1 ? 's' : '') + ' affiché' + (collisions > 1 ? 's' : '') + ' côte à côte.';
+      if (warnings.length) msg += ' ' + warnings.slice(0, 2).join(' ');
+      setEdtFeedback(msg, 'ok');
+      edtFileInput.value = '';
+    } catch (err) {
+      setEdtFeedback(err && err.message ? err.message : 'Échec de l’import.', 'error');
+    } finally {
+      edtImportBtn.disabled = false;
+    }
+  });
 
   // Auth UI
   document.querySelectorAll('.auth-tab').forEach(tab => {
